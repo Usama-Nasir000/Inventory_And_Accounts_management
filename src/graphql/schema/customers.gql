@@ -1,0 +1,111 @@
+type Customer {
+  id: ID!
+  name: String
+  first_name: String
+  middle_name: String
+  last_name: String
+  type: String
+  category: String
+  email: String
+  work_phone: String
+  phone: String
+  currency: String
+  terms: String
+  amount: Float
+  billing_address: String
+  billing_city: String
+  billing_zip: Float
+  billing_state: String
+  billing_country: String
+  shipping_address: String
+  shipping_city: String
+  shipping_zip: Float
+  shipping_state: String
+  shipping_country: String
+  contact_first_name: String
+  contact_last_name: String
+  contact_email: String
+  contact_phone: String
+  contact_job_role: String
+}
+
+type getCustomers {
+  id: ID!
+  name: String
+  first_name: String
+  middle_name: String
+  last_name: String
+  type: String
+  category: String
+  email: String
+  work_phone: String
+  phone: String
+  currency: String
+  terms: String
+  amount: Float
+  billing_address: String
+  billing_city: String
+  billing_zip: Float
+  billing_state: String
+  billing_country: String
+  shipping_address: String
+  shipping_city: String
+  shipping_zip: Float
+  shipping_state: String
+  shipping_country: String
+  contact_first_name: String
+  contact_last_name: String
+  contact_email: String
+  contact_phone: String
+  contact_job_role: String
+}
+
+type getCustomersResponse {
+  code: Int
+  status: String
+  data: getCustomers
+}
+
+type getCustomerListResponse {
+  code: Int
+  status: String
+  count: Int
+  data: [getCustomers]
+}
+
+type Query {
+  getCustomers: getCustomerListResponse
+  getCustomer(id: ID!): getCustomersResponse
+}
+
+type Mutation {
+  saveCustomer(
+    name: String
+    first_name: String
+    middle_name: String
+    last_name: String
+    type: String
+    category: String
+    email: String
+    work_phone: String
+    phone: String
+    currency: String
+    terms: String
+    amount: Float
+    billing_address: String
+    billing_city: String
+    billing_zip: Float
+    billing_state: String
+    billing_country: String
+    shipping_address: String
+    shipping_city: String
+    shipping_zip: Float
+    shipping_state: String
+    shipping_country: String
+    contact_first_name: String
+    contact_last_name: String
+    contact_email: String
+    contact_phone: String
+    contact_job_role: String
+  ): Customer
+}

@@ -1,0 +1,78 @@
+type Item {
+  id: ID!
+  name: String
+  code: String
+  price: Float
+  category: String
+  status: String
+  cogs_account: String
+  inventory_account: String
+  income_account: String
+  selected_costing_option: String
+  selected_vendor: String
+  drop_shipping: Boolean
+  purchase_description: String
+  selected_locations: [String]
+  sales_description: String
+  sales_price: Float
+  price_level_name: String
+  qty_1: Int
+  price_1: Float
+  qty_2: Int
+  price_2: Float
+  qty_3: Int
+  price_3: Float
+  qty_4: Int
+  price_4: Float
+  qty_5: Int
+  price_5: Float
+}
+
+type getItemsResponse {
+  code: Int
+  status: String
+  data: Item
+}
+
+type getItemListResponse {
+  code: Int
+  status: String
+  count: Int
+  data: [Item]
+}
+
+type Query {
+  getItems: getItemListResponse
+  getItem(id: ID!): getItemsResponse
+}
+
+type Mutation {
+  saveItem(
+    name: String
+    code: String
+    price: Float
+    category: String
+    status: String
+    cogs_account: String
+    inventory_account: String
+    income_account: String
+    selected_costing_option: String
+    selected_vendor: String
+    drop_shipping: Boolean
+    purchase_description: String
+    selected_locations: [String]
+    sales_description: String
+    sales_price: Float
+    price_level_name: String
+    qty_1: Int
+    price_1: Float
+    qty_2: Int
+    price_2: Float
+    qty_3: Int
+    price_3: Float
+    qty_4: Int
+    price_4: Float
+    qty_5: Int
+    price_5: Float
+  ): Item
+}
