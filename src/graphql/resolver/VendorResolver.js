@@ -49,7 +49,7 @@ const resolvers = {
         if (result.rowCount > 0) {
           const response = {
             code: 200,
-            status: 'success',
+            status: 'success', 
             data: result.rows[0],
           };
           return response;
@@ -75,7 +75,6 @@ const resolvers = {
       try { 
         const query = {
           text: `
-          SELECT
           v.userid,
           v.vendorid,
           v.vendor_name,
@@ -106,9 +105,10 @@ const resolvers = {
           LEFT JOIN vendorbillingaddresses AS vba ON v.vendorid = vba.vendorid
           LEFT JOIN vendorshippingaddresses AS vsa ON v.vendorid = vsa.vendorid
           LEFT JOIN vendorcontactperson AS vcp ON v.vendorid = vcp.vendorid
-          INNER JOIN User ON vendor.UserID = User.UserID
           `
         }; 
+        // SELECT * from vendor
+        // INNER JOIN User ON vendor.UserID = User.UserID
 
         const result = await db.query(query.text);
         // console.log(result);
@@ -181,16 +181,17 @@ const resolvers = {
 
         // Insert data into vendorbillingaddresses table
         const saveBillingAddressQuery = {
-          text: `INSERT INTO vendorbillingaddresses (UserID, VendorID, Address, City, State, Country, IsDefault)
-            VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *;
+          text: `INSERT INTO vendorbillingaddresses (userID, vendorID, address, state, city, country, zipcode, IsDefault)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *;
           `,
           values: [
             content.userid,
             content.vendorid,
             content.billing_address.address,
-            content.billing_address.city,
             content.billing_address.state,
+            content.billing_address.city,
             content.billing_address.country,
+            content.billing_address.zip,
             content.billing_address.isdefault
           ],
 
@@ -199,16 +200,17 @@ const resolvers = {
 
         // Insert data into vendorshippingaddresses table
         const saveShippingAddressQuery = {
-          text: `INSERT INTO vendorshippingaddresses (UserID, VendorID, Address, City, State, Country, IsDefault)
-            VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *;
+          text: `INSERT INTO vendorshippingaddresses (UserID, VendorID, address, state, city, country, zipcode, IsDefault)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *;
           `,
           values: [
             content.userid,
             content.vendorid,
             content.shipping_address.address,
-            content.shipping_address.city,
             content.shipping_address.state,
+            content.shipping_address.city,
             content.shipping_address.country,
+            content.shipping_address.zip,
             content.shipping_address.isdefault
           ],
         };
