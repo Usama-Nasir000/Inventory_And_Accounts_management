@@ -6,7 +6,7 @@ const pool = connect();
 const db = {
 
   query: (text, values, callback) => {
-    return pool.query(text, values, callback)
+    return pool.query(text, values)
   },
   connect: () => {
     return pool.connect();

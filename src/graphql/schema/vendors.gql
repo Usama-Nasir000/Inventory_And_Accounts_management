@@ -1,37 +1,24 @@
-type getVendors {
-  id: ID!
-  name: String
-  first_name: String
-  middle_name: String
-  last_name: String
-  type: String
-  category: String
-  email: String
-  work_phone: String
-  phone: String
-  currency: String
-  terms: String
-  amount: Float
-  billing_address: String
-  billing_city: String
-  billing_zip: Float
-  billing_state: String
-  billing_country: String
-  shipping_address: String
-  shipping_city: String
-  shipping_zip: Float
-  shipping_state: String
-  shipping_country: String
-  contact_first_name: String
-  contact_last_name: String
-  contact_email: String
-  contact_phone: String
-  contact_job_role: String
+type BillingAddress {
+  address: String
+  city: String
+  zip: Float
+  state: String
+  country: String
+}
+
+type ShippingAddress {
+  address: String
+  city: String
+  zip: Float
+  state: String
+  country: String
 }
 
 type Vendor {
-  id: ID!
-  name: String
+  # id: ID
+  userid: Int
+  vendorid: Int
+  vendor_name: String
   first_name: String
   middle_name: String
   last_name: String
@@ -40,19 +27,11 @@ type Vendor {
   email: String
   work_phone: String
   phone: String
-  currency: String
-  terms: String
-  amount: Float
-  billing_address: String
-  billing_city: String
-  billing_zip: Float
-  billing_state: String
-  billing_country: String
-  shipping_address: String
-  shipping_city: String
-  shipping_zip: Float
-  shipping_state: String
-  shipping_country: String
+  billing_address: BillingAddress
+  shipping_address: ShippingAddress
+  vendor_contact_person: VendorContactPerson
+}
+type VendorContactPerson{
   contact_first_name: String
   contact_last_name: String
   contact_email: String
@@ -60,53 +39,65 @@ type Vendor {
   contact_job_role: String
 }
 
-type getVendorsResponse {
-  code: Int
-  status: String
-  data: getVendors
+input VendorContactPersonInput {
+  contact_first_name: String
+  contact_last_name: String
+  contact_email: String
+  contact_phone: String
+  contact_job_role: String
+}
+
+input BillingAddressInput {
+  address: String
+  city: String
+  zip: Float
+  state: String
+  country: String
+}
+
+input ShippingAddressInput {
+  address: String
+  city: String
+  zip: Float
+  state: String
+  country: String
+}
+
+type getVendorResponse {
+  # code: Int
+  # status: String
+  data: Vendor
 }
 
 type getVendorListResponse {
-  code: Int
-  status: String
-  count: Int
-  data: [getVendors]
+  # code: Int
+  # status: String
+  # count: Int
+  data: [Vendor]
 }
 
 type Query {
   getVendors: getVendorListResponse
-  getVendor(id: ID!): getVendorsResponse
+  # getVendor(id: ID!): getVendorsResponse
+  getVendor(vendorid: Int!): getVendorResponse
+
 }
 
 type Mutation {
   saveVendor(
-    name: String
-    first_name: String
-    middle_name: String
-    last_name: String
-    type: String
+    userid: Int
+    vendorid: Int
+    vendor_name: String!
+    firstname: String
+    middlename: String
+    lastname: String
+    vendor_type: String
     category: String
     email: String
     work_phone: String
     phone: String
-    currency: String
-    terms: String
-    amount: Float
-    billing_address: String
-    billing_city: String
-    billing_zip: Float
-    billing_state: String
-    billing_country: String
-    shipping_address: String
-    shipping_city: String
-    shipping_zip: Float
-    shipping_state: String
-    shipping_country: String
-    contact_first_name: String
-    contact_last_name: String
-    contact_email: String
-    contact_phone: String
-    contact_job_role: String
+    billing_address: BillingAddressInput
+    shipping_address: ShippingAddressInput
+    vendor_contact_person: VendorContactPersonInput
   ): Vendor
 }
-
