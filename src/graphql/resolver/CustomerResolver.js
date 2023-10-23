@@ -1,6 +1,7 @@
 
 // import { InputCustomer } from "../../models/Customer"
 // import { QueryConfig } from "../types/query-config"
+const { log } = require("console");
 const { db } = require("../../db/index")
 
 const resolvers = {
@@ -49,7 +50,7 @@ const resolvers = {
         };
 
         const result = await db.query(query.text, query.values);
-
+        // console.log(id);
         if (result.rowCount > 0) {
           const response = {
             code: 200,

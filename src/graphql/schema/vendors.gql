@@ -1,21 +1,22 @@
 type BillingAddress {
   address: String
-  city: String
-  zip: String
   state: String
+  city: String
   country: String
+  zipcode: String
+  isdefault: Boolean
 }
 
 type ShippingAddress {
   address: String
-  city: String
-  zip: String
   state: String
+  city: String
   country: String
+  zipcode: String
+  isdefault: Boolean
 }
 
 type Vendor {
-  # id: ID
   userid: Int
   vendorid: Int
   vendor_name: String
@@ -49,23 +50,25 @@ input VendorContactPersonInput {
 
 input BillingAddressInput {
   address: String
-  city: String
-  zip: String
   state: String
+  city: String
   country: String
+  zipcode: String
+  isdefault: Boolean
 }
 
 input ShippingAddressInput {
   address: String
-  city: String
-  zip: String
   state: String
+  city: String
   country: String
+  zipcode: String
+  isdefault: Boolean
 }
 
 type getVendorResponse {
-  # code: Int
-  # status: String
+  code: Int
+  status: String
   data: Vendor
 }
 
@@ -79,7 +82,7 @@ type getVendorListResponse {
 type Query {
   getVendors: getVendorListResponse
   # getVendor(id: ID!): getVendorsResponse
-  getVendor(vendorid: Int!): getVendorResponse
+  getVendor(id: ID!): getVendorResponse
 
 }
 

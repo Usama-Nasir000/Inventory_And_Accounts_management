@@ -7,45 +7,52 @@ const resolvers = {
       try {
         const query = {
           text: `
-            SELECT
-            v.userid,
-            v.vendorid,
-            v.vendor_name,
-            v.firstname,
-            v.middlename,
-            v.lastname,
-            v.vendor_type,
-            v.category,
-            v.work_phone,
-            v.phone,
-            v.email,
-            vba.address,
-            vba.city,
-            vba.state,
-            vba.country,
-            vba.isdefault,
-            vsa.address,
-            vsa.city,
-            vsa.state,
-            vsa.country,
-            vsa.isdefault,
-            vcp.cpfirstname,
-            vcp.cplastname,
-            vcp.cpemail,
-            vcp.cpphone,
-            vcp.cpjobrole
-            FROM vendor AS v
-            LEFT JOIN vendorbillingaddresses AS vba ON v.vendorid = vba.vendorid
-            LEFT JOIN vendorshippingaddresses AS vsa ON v.vendorid = vsa.vendorid
-            LEFT JOIN vendorcontactperson AS vcp ON v.vendorid = vcp.vendorid
-            WHERE vendorid = $1;
-            `,
+          SELECT 
+          vendor.userid,
+          vendor.vendorid,
+          vendor.vendor_name,
+          vendor.firstname,
+          vendor.middlename,
+          vendor.lastname,
+          vendor.vendor_type,
+          vendor.category,
+          vendor.work_phone, 
+          vendor.phone,
+          vendor.email,
+          vendorbillingaddresses.address AS billing_address,
+          vendorbillingaddresses.state AS billing_state,
+          vendorbillingaddresses.city AS billing_city,
+          vendorbillingaddresses.country AS billing_country,
+          vendorbillingaddresses.zipcode AS billing_zipcode,
+          vendorbillingaddresses.isdefault AS billing_isdefault,
+          vendorshippingaddresses.address AS shipping_address,
+          vendorshippingaddresses.state AS shipping_state,
+          vendorshippingaddresses.city AS shipping_city,
+          vendorshippingaddresses.country AS shipping_country,
+          vendorshippingaddresses.zipcode AS shipping_zipcode,
+          vendorshippingaddresses.isdefault AS shipping_isdefault,
+          vendorcontactperson.cpfirstname AS contact_first_name,
+          vendorcontactperson.cplastname AS contact_last_name,
+          vendorcontactperson.cpemail AS contact_email,
+          vendorcontactperson.cpphone AS contact_phone,
+          vendorcontactperson.cpjobrole AS contact_job_role
+      FROM vendor
+      INNER JOIN vendorbillingaddresses ON vendor.vendorid = vendorbillingaddresses.vendorid
+      INNER JOIN vendorshippingaddresses ON vendor.vendorid = vendorshippingaddresses.vendorid
+      INNER JOIN vendorcontactperson ON vendor.vendorid = vendorcontactperson.vendorid
+      WHERE vendor.vendorid = $1;
+       
+  `,
             values: [id],
           };
           // INNER JOIN User ON vendor.UserID = User.UserID
 
-        const result = await db.query(query.text, query.values);
-
+          console.log(query.values);
+          
+          const result = await db.query(query.text, query.values);
+          console.log(result);
+          console.log(id);
+          
         if (result.rowCount > 0) {
           const response = {
             code: 200,
@@ -75,42 +82,45 @@ const resolvers = {
       try { 
         const query = {
           text: `
-          v.userid,
-          v.vendorid,
-          v.vendor_name,
-          v.firstname,
-          v.middlename,
-          v.lastname,
-          v.vendor_type,
-          v.category,
-          v.work_phone, 
-          v.phone,
-          v.email,
-          vba.address,
-          vba.city,
-          vba.state,
-          vba.country,
-          vba.isdefault,
-          vsa.address,
-          vsa.city,
-          vsa.state,
-          vsa.country,
-          vsa.isdefault,
-          vcp.cpfirstname,
-          vcp.cplastname,
-          vcp.cpemail,
-          vcp.cpphone,
-          vcp.cpjobrole
-          FROM vendor AS v
-          LEFT JOIN vendorbillingaddresses AS vba ON v.vendorid = vba.vendorid
-          LEFT JOIN vendorshippingaddresses AS vsa ON v.vendorid = vsa.vendorid
-          LEFT JOIN vendorcontactperson AS vcp ON v.vendorid = vcp.vendorid
-          `
+          SELECT 
+              vendor.userid,
+              vendor.vendorid,
+              vendor.vendor_name,
+              vendor.firstname,
+              vendor.middlename,
+              vendor.lastname,
+              vendor.vendor_type,
+              vendor.category,
+              vendor.work_phone, 
+              vendor.phone,
+              vendor.email,
+              vendorbillingaddresses.address AS billing_address,
+              vendorbillingaddresses.state AS billing_state,
+              vendorbillingaddresses.city AS billing_city,
+              vendorbillingaddresses.country AS billing_country,
+              vendorbillingaddresses.zipcode AS billing_zipcode,
+              vendorbillingaddresses.isdefault AS billing_isdefault,
+              vendorshippingaddresses.address AS shipping_address,
+              vendorshippingaddresses.state AS shipping_state,
+              vendorshippingaddresses.city AS shipping_city,
+              vendorshippingaddresses.country AS shipping_country,
+              vendorshippingaddresses.zipcode AS shipping_zipcode,
+              vendorshippingaddresses.isdefault AS shipping_isdefault,
+              vendorcontactperson.cpfirstname AS contact_first_name,
+              vendorcontactperson.cplastname AS contact_last_name,
+              vendorcontactperson.cpemail AS contact_email,
+              vendorcontactperson.cpphone AS contact_phone,
+              vendorcontactperson.cpjobrole AS contact_job_role
+          FROM vendor
+          LEFT JOIN vendorbillingaddresses ON vendor.vendorid = vendorbillingaddresses.vendorid
+          LEFT JOIN vendorshippingaddresses ON vendor.vendorid = vendorshippingaddresses.vendorid
+          LEFT JOIN vendorcontactperson ON vendor.vendorid = vendorcontactperson.vendorid;    
+      `
         }; 
         // SELECT * from vendor
         // INNER JOIN User ON vendor.UserID = User.UserID
 
-        const result = await db.query(query.text);
+        const result =await db.query(query.text);
         // console.log(result);
         // console.log("ueryyyyyy", query.text);
         if (result.rowCount > 0) {
@@ -182,7 +192,7 @@ const resolvers = {
         // Insert data into vendorbillingaddresses table
         const saveBillingAddressQuery = {
           text: `INSERT INTO vendorbillingaddresses (userID, vendorID, address, state, city, country, zipcode, IsDefault)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *;
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING (vendorbillingaddresses.address,vendorbillingaddresses.state,vendorbillingaddresses.city,vendorbillingaddresses.country,vendorbillingaddresses.zipcode,vendorbillingaddresses.IsDefault);
           `,
           values: [
             content.userid,
@@ -191,7 +201,7 @@ const resolvers = {
             content.billing_address.state,
             content.billing_address.city,
             content.billing_address.country,
-            content.billing_address.zip,
+            content.billing_address.zipcode,
             content.billing_address.isdefault
           ],
 
@@ -201,7 +211,7 @@ const resolvers = {
         // Insert data into vendorshippingaddresses table
         const saveShippingAddressQuery = {
           text: `INSERT INTO vendorshippingaddresses (UserID, VendorID, address, state, city, country, zipcode, IsDefault)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *;
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING ( address, state, city, country, zipcode, IsDefault);
           `,
           values: [
             content.userid,
@@ -210,7 +220,7 @@ const resolvers = {
             content.shipping_address.state,
             content.shipping_address.city,
             content.shipping_address.country,
-            content.shipping_address.zip,
+            content.shipping_address.zipcode,
             content.shipping_address.isdefault
           ],
         };
@@ -219,7 +229,7 @@ const resolvers = {
         // Insert data into vendorcontactperson table
         const saveContactPersonQuery = {
           text: `INSERT INTO vendorcontactperson (UserID, VendorID, CPFirstName, CPLastName, CPEmail, CPPhone, CPJobRole)
-            VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *;
+            VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING (CPFirstName, CPLastName, CPEmail, CPPhone, CPJobRole);
           `,
           values: [
             content.userid,
