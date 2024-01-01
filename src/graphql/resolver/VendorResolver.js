@@ -1,4 +1,4 @@
-// ==============================================================================================================================================================
+const { error } = require("console");
 const { db } = require("../../db/index");
 
 const resolvers = {
@@ -8,57 +8,80 @@ const resolvers = {
         const query = {
           text: `
           SELECT 
-          vendor.userid,
-          vendor.vendorid,
-          vendor.vendor_name,
-          vendor.firstname,
-          vendor.middlename,
-          vendor.lastname,
-          vendor.vendor_type,
-          vendor.category,
-          vendor.work_phone, 
-          vendor.phone,
-          vendor.email,
-          vendorbillingaddresses.address AS billing_address,
-          vendorbillingaddresses.state AS billing_state,
-          vendorbillingaddresses.city AS billing_city,
-          vendorbillingaddresses.country AS billing_country,
-          vendorbillingaddresses.zipcode AS billing_zipcode,
-          vendorbillingaddresses.isdefault AS billing_isdefault,
-          vendorshippingaddresses.address AS shipping_address,
-          vendorshippingaddresses.state AS shipping_state,
-          vendorshippingaddresses.city AS shipping_city,
-          vendorshippingaddresses.country AS shipping_country,
-          vendorshippingaddresses.zipcode AS shipping_zipcode,
-          vendorshippingaddresses.isdefault AS shipping_isdefault,
-          vendorcontactperson.cpfirstname AS contact_first_name,
-          vendorcontactperson.cplastname AS contact_last_name,
-          vendorcontactperson.cpemail AS contact_email,
-          vendorcontactperson.cpphone AS contact_phone,
-          vendorcontactperson.cpjobrole AS contact_job_role
-      FROM vendor
-      INNER JOIN vendorbillingaddresses ON vendor.vendorid = vendorbillingaddresses.vendorid
-      INNER JOIN vendorshippingaddresses ON vendor.vendorid = vendorshippingaddresses.vendorid
-      INNER JOIN vendorcontactperson ON vendor.vendorid = vendorcontactperson.vendorid
-      WHERE vendor.vendorid = $1;
-       
-  `,
-            values: [id],
-          };
-          // INNER JOIN User ON vendor.UserID = User.UserID
+          Vendor.UserID,
+          Vendor.VendorID,
+          Vendor.category,
+          Vendor.company_name,
+          Vendor.Email,
+          Vendor.main_phone,
+          Vendor.work_phone,
+          Vendor.first_name,
+          Vendor.middle_name,
+          Vendor.last_name,
+          Vendor.display_name,
+          Vendor.Website,
+          Vendor.Amount,
+          Vendor.Currency,
+          Vendor.payment_terms,
+          ARRAY_AGG(DISTINCT JSONB_BUILD_OBJECT(
+          'billing_location', vendor_billing_address.location,
+          'billing_state', vendor_billing_address.State,
+          'billing_city', vendor_billing_address.City,
+          'billing_country', vendor_billing_address.Country,
+          'billing_zipcode', vendor_billing_address.ZipCode,
+          'billing_isdefault', vendor_billing_address.IsDefault
+          )) AS vendor_billing_address,
+              ARRAY_AGG(DISTINCT JSONB_BUILD_OBJECT(
+                  'shipping_location', Vendor_Shipping_Addresses.location,
+                  'shipping_state', Vendor_Shipping_Addresses.State,
+                  'shipping_city', Vendor_Shipping_Addresses.City,
+                  'shipping_country', Vendor_Shipping_Addresses.Country,
+                  'shipping_zipcode', Vendor_Shipping_Addresses.ZipCode,
+                  'shipping_isdefault', Vendor_Shipping_Addresses.IsDefault
+                  )) AS Vendor_Shipping_Addresses,
+                  ARRAY_AGG(DISTINCT JSONB_BUILD_OBJECT(
+                      'contact_first_name', Vendor_Contact_Person.CPFirstName,
+                      'contact_last_name', Vendor_Contact_Person.CPLastName,
+                      'contact_email', Vendor_Contact_Person.CPEmail,
+                      'contact_phone', Vendor_Contact_Person.CPcontact,
+                      'contact_job_role', Vendor_Contact_Person.CPJobRole
+                      )) AS Vendor_Contact_Person
+                      FROM Vendor
+                      LEFT JOIN vendor_billing_address ON Vendor.VendorID = vendor_billing_address.VendorID
+                      LEFT JOIN Vendor_Shipping_Addresses ON Vendor.VendorID = Vendor_Shipping_Addresses.VendorID
+                      LEFT JOIN Vendor_Contact_Person ON Vendor.VendorID = Vendor_Contact_Person.VendorID
+                      WHERE Vendor.VendorID = $1
+                      GROUP BY 
+                      Vendor.UserID,
+                      Vendor.VendorID,
+                      Vendor.category,
+                      Vendor.company_name,
+                      Vendor.Email,
+                      Vendor.main_phone,
+                      Vendor.work_phone,
+                      Vendor.first_name,
+                      Vendor.middle_name,
+                      Vendor.last_name,
+                      Vendor.display_name,
+                      Vendor.Website,
+                      Vendor.Amount,
+                      Vendor.Currency,
+                      Vendor.payment_terms;
+                `,
+          values: [id],
+        };
 
-          console.log(query.values);
-          
-          const result = await db.query(query.text, query.values);
-          console.log(result);
-          console.log(id);
-          
+        const result = await db.query(query.text, query.values);
+        console.log("Result in Vendior resolver -------- ", JSON.stringify(result.rows));
+        console.log("ID in vendor resolver --------------", id);
+
         if (result.rowCount > 0) {
           const response = {
             code: 200,
-            status: 'success', 
+            status: 'success',
             data: result.rows[0],
           };
+          console.log(response.data.vendor_billing_address[0]);
           return response;
         } else {
           const response = {
@@ -72,57 +95,84 @@ const resolvers = {
         const response = {
           code: 500,
           status: 'error',
-          data: null,
+          data: error,
         };
         return response;
       }
     },
 
     getVendors: async () => {
-      try { 
+      try {
         const query = {
+          // SELECT * from vendor
           text: `
           SELECT 
-              vendor.userid,
-              vendor.vendorid,
-              vendor.vendor_name,
-              vendor.firstname,
-              vendor.middlename,
-              vendor.lastname,
-              vendor.vendor_type,
-              vendor.category,
-              vendor.work_phone, 
-              vendor.phone,
-              vendor.email,
-              vendorbillingaddresses.address AS billing_address,
-              vendorbillingaddresses.state AS billing_state,
-              vendorbillingaddresses.city AS billing_city,
-              vendorbillingaddresses.country AS billing_country,
-              vendorbillingaddresses.zipcode AS billing_zipcode,
-              vendorbillingaddresses.isdefault AS billing_isdefault,
-              vendorshippingaddresses.address AS shipping_address,
-              vendorshippingaddresses.state AS shipping_state,
-              vendorshippingaddresses.city AS shipping_city,
-              vendorshippingaddresses.country AS shipping_country,
-              vendorshippingaddresses.zipcode AS shipping_zipcode,
-              vendorshippingaddresses.isdefault AS shipping_isdefault,
-              vendorcontactperson.cpfirstname AS contact_first_name,
-              vendorcontactperson.cplastname AS contact_last_name,
-              vendorcontactperson.cpemail AS contact_email,
-              vendorcontactperson.cpphone AS contact_phone,
-              vendorcontactperson.cpjobrole AS contact_job_role
-          FROM vendor
-          LEFT JOIN vendorbillingaddresses ON vendor.vendorid = vendorbillingaddresses.vendorid
-          LEFT JOIN vendorshippingaddresses ON vendor.vendorid = vendorshippingaddresses.vendorid
-          LEFT JOIN vendorcontactperson ON vendor.vendorid = vendorcontactperson.vendorid;    
-      `
-        }; 
-        // SELECT * from vendor
-        // INNER JOIN User ON vendor.UserID = User.UserID
+          Vendor.UserID,
+          Vendor.VendorID,
+          Vendor.category,
+          Vendor.company_name,
+          Vendor.Email,
+          Vendor.main_phone,
+          Vendor.work_phone,
+          Vendor.first_name,
+          Vendor.middle_name,
+          Vendor.last_name,
+          Vendor.display_name,
+          Vendor.Website,
+          Vendor.Amount,
+          Vendor.Currency,
+          Vendor.payment_terms,
+          ARRAY_AGG(DISTINCT JSONB_BUILD_OBJECT(
+            'location', vendor_billing_address.location,
+            'state', vendor_billing_address.State,
+            'city', vendor_billing_address.City,
+            'country', vendor_billing_address.Country,
+            'zipcode', vendor_billing_address.ZipCode,
+            'isdefault', vendor_billing_address.IsDefault
+          )) AS vendor_billing_address,
+              ARRAY_AGG(DISTINCT JSONB_BUILD_OBJECT(
+                  'location', vendor_shipping_addresses.location,
+                  'state', vendor_shipping_addresses.State,
+                  'city', vendor_shipping_addresses.City,
+                  'country', vendor_shipping_addresses.Country,
+                  'zipcode', vendor_shipping_addresses.ZipCode,
+                  'isdefault', vendor_shipping_addresses.IsDefault
+                  )) AS vendor_shipping_addresses,
+                  ARRAY_AGG(DISTINCT JSONB_BUILD_OBJECT(
+                      'contact_first_name', Vendor_Contact_Person.CPFirstName,
+                      'contact_last_name', Vendor_Contact_Person.CPLastName,
+                      'contact_email', Vendor_Contact_Person.CPEmail,
+                      'contact_phone', Vendor_Contact_Person.CPcontact,
+                      'contact_job_role', Vendor_Contact_Person.CPJobRole
+                      )) AS Vendor_Contact_Person
+                      FROM Vendor
+                      LEFT JOIN vendor_billing_address ON Vendor.VendorID = vendor_billing_address.VendorID
+                      LEFT JOIN vendor_shipping_addresses ON Vendor.VendorID = vendor_shipping_addresses.VendorID
+                      LEFT JOIN Vendor_Contact_Person ON Vendor.VendorID = Vendor_Contact_Person.VendorID
+                      GROUP BY 
+                      Vendor.UserID,
+                      Vendor.VendorID,
+                      Vendor.category,
+                      Vendor.company_name,
+                      Vendor.Email,
+                      Vendor.main_phone,
+                      Vendor.work_phone,
+                      Vendor.first_name,
+                      Vendor.middle_name,
+                      Vendor.last_name,
+                      Vendor.display_name,
+                      Vendor.Website,
+                      Vendor.Amount,
+                      Vendor.Currency,
+                      Vendor.payment_terms;
+                      `,
+        };
 
-        const result =await db.query(query.text);
-        // console.log(result);
-        // console.log("ueryyyyyy", query.text);
+        const result = await db.query(query.text);
+        console.log(result.rows);
+        console.log("Result in Vendor resolver -------- ", JSON.stringify(result.rows));
+        console.log("ID in vendor resolver --------------", result.id);
+
         if (result.rowCount > 0) {
           const response = {
             code: 200,
@@ -130,6 +180,7 @@ const resolvers = {
             count: result.rowCount,
             data: result.rows,
           };
+          console.log(response);
 
           return response;
         } else {
@@ -155,146 +206,255 @@ const resolvers = {
     },
   },
 
-
-
-
   Mutation: {
     saveVendor: async (_, content) => {
       const client = await db.connect();
       console.log("connection build on vendor resolver");
-      console.log("Content in vendorResolver:  ",content);
- 
+      console.log("Content in vendorResolver:  ", content);
+      let response;
+      let vendorResult;
+      let vendorBillingAddressResult;
+      let vendorShippingAddressResult;
+      let vendorContactPersonResult;
+      
       try {
         await client.query('BEGIN');
-
+  
         const saveVendorQuery = {
-          text: `INSERT INTO vendor (userid, vendorid, vendor_name, firstname, middlename, lastname, vendor_type, category, work_phone, phone, email)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *;
+          text: `
+            INSERT INTO Vendor (
+              userid,
+              vendorid,
+              category,
+              company_name,
+              email,
+              main_phone,
+              work_phone,
+              first_name,
+              middle_name,
+              last_name,
+              display_name,
+              website,
+              amount,
+              currency,
+              payment_terms
+            )
+            VALUES (
+              $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15
+            )
+            RETURNING *;
           `,
           values: [
             content.userid,
             content.vendorid,
-            content.vendor_name,
-            content.firstname,
-            content.middlename,
-            content.lastname,
-            content.vendor_type,
             content.category,
+            content.company_name,
+            content.email,
+            content.main_phone,
             content.work_phone,
-            content.phone,
-            content.email
+            content.first_name,
+            content.middle_name,
+            content.last_name,
+            content.display_name,
+            content.website,
+            content.amount,
+            content.currency,
+            content.payment_terms,
           ],
         };
+  
+        vendorResult = await client.query(saveVendorQuery.text, saveVendorQuery.values);
+  
+        if (vendorResult.rowCount !== 1) {
+          throw new Error('Failed to insert vendor');
+        }
 
-        const vendorResult = await client.query(saveVendorQuery.text, saveVendorQuery.values);
-
-
-        // Insert data into vendorbillingaddresses table
+        // Save vendor_billing_address
+        const billingAddress = content.vendor_billing_address;
         const saveBillingAddressQuery = {
-          text: `INSERT INTO vendorbillingaddresses (userID, vendorID, address, state, city, country, zipcode, IsDefault)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING (vendorbillingaddresses.address,vendorbillingaddresses.state,vendorbillingaddresses.city,vendorbillingaddresses.country,vendorbillingaddresses.zipcode,vendorbillingaddresses.IsDefault);
+          text: `
+            INSERT INTO vendor_billing_address (
+              UserID,
+              VendorID,
+              location,
+              State,
+              City,
+              Country,
+              ZipCode,
+              IsDefault
+            )
+            VALUES (
+              $1, $2, $3, $4, $5, $6, $7, $8
+            )
+            RETURNING *;
           `,
           values: [
             content.userid,
             content.vendorid,
-            content.billing_address.address,
-            content.billing_address.state,
-            content.billing_address.city,
-            content.billing_address.country,
-            content.billing_address.zipcode,
-            content.billing_address.isdefault
+            billingAddress.location,
+            billingAddress.billing_state,
+            billingAddress.billing_city,
+            billingAddress.billing_country,
+            billingAddress.billing_zipcode,
+            billingAddress.billing_isdefault,
           ],
-
         };
-        await client.query(saveBillingAddressQuery.text, saveBillingAddressQuery.values);
+  
+        vendorBillingAddressResult = await client.query(saveBillingAddressQuery.text, saveBillingAddressQuery.values);
+  
+        if (vendorBillingAddressResult.rowCount !== 1) {
+          throw new Error('Failed to insert Vendor Billing Address');
+        }
 
-        // Insert data into vendorshippingaddresses table
+
+        // Save VendorShippingAddresses
+        const shippingAddress = content.Vendor_Shipping_Addresses;
         const saveShippingAddressQuery = {
-          text: `INSERT INTO vendorshippingaddresses (UserID, VendorID, address, state, city, country, zipcode, IsDefault)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING ( address, state, city, country, zipcode, IsDefault);
+          text: `
+            INSERT INTO VendorShippingAddresses (
+              UserID,
+              VendorID,
+              location,
+              State,
+              City,
+              Country,
+              ZipCode,
+              IsDefault
+            )
+            VALUES (
+              $1, $2, $3, $4, $5, $6, $7, $8
+            )
+            RETURNING *;
           `,
           values: [
             content.userid,
             content.vendorid,
-            content.shipping_address.address,
-            content.shipping_address.state,
-            content.shipping_address.city,
-            content.shipping_address.country,
-            content.shipping_address.zipcode,
-            content.shipping_address.isdefault
+            shippingAddress.shipping_location,
+            shippingAddress.shipping_state,
+            shippingAddress.shipping_city,
+            shippingAddress.shipping_country,
+            shippingAddress.shipping_zipcode,
+            shippingAddress.shipping_isdefault,
           ],
         };
-        await client.query(saveShippingAddressQuery.text, saveShippingAddressQuery.values);
+  
+        vendorShippingAddressResult = await client.query(saveShippingAddressQuery.text, saveShippingAddressQuery.values);
+  
+        if (vendorShippingAddressResult.rowCount !== 1) {
+          throw new Error('Failed to insert Vendor Shipping Address');
+        }
 
-        // Insert data into vendorcontactperson table
-        const saveContactPersonQuery = {
-          text: `INSERT INTO vendorcontactperson (UserID, VendorID, CPFirstName, CPLastName, CPEmail, CPPhone, CPJobRole)
-            VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING (CPFirstName, CPLastName, CPEmail, CPPhone, CPJobRole);
-          `,
-          values: [
-            content.userid,
-            content.vendorid,
-            content.vendor_contact_person.contact_first_name,
-            content.vendor_contact_person.contact_last_name,
-            content.vendor_contact_person.contact_email,
-            content.vendor_contact_person.contact_phone,
-            content.vendor_contact_person.contact_job_role
-          ],
-        };
-        await client.query(saveContactPersonQuery.text, saveContactPersonQuery.values);
+
+
+        // Save VendorContactPerson
+        const contactPersons = content.Vendor_Contact_Person;
+        for (const contactPerson of contactPersons) {
+          const saveContactPersonQuery = {
+            text: `
+              INSERT INTO VendorContactPerson (
+                UserID,
+                VendorID,
+                CPFirstName,
+                CPLastName,
+                CPEmail,
+                CPContact,
+                CPJobRole
+              )
+              VALUES (
+                $1, $2, $3, $4, $5, $6, $7
+              )
+              RETURNING *;
+            `,
+            values: [
+              content.userid,
+              content.vendorid,
+              contactPerson.contact_first_name,
+              contactPerson.contact_last_name,
+              contactPerson.contact_email,
+              contactPerson.contact_phone,
+              contactPerson.contact_job_role,
+            ],
+          };
+  
+          vendorContactPersonResult = await client.query(saveContactPersonQuery.text, saveContactPersonQuery.values);
+  
+          if (vendorContactPersonResult.rowCount !== 1) {
+            throw new Error('Failed To Insert Vendor Contact Person')
+          }
+        }
+
+         response = {
+        code: 200,
+        status: 'success',
+        id: content.vendorid,
+        vendorResult: vendorResult.rows[0],
+        vendorBillingAddressCount: vendorBillingAddressResult.rowCount,
+        vendorShippingAddressCount: vendorShippingAddressResult.rowCount,
+        vendorContactPersonCount: vendorContactPersonResult.rowCount,
+      };
 
         // Commit the transaction if everything is successful
         await client.query('COMMIT');
 
-        // Return the newly created vendor
-        return vendorResult.rows[0];
-      } catch (error) {
+        return response;
+      }catch (error) {
         console.log(error);
         await client.query('ROLLBACK');
-        const response = {
+        response = {
+          code: 500,
           status: 'error',
-          message: error.message,
+          data: null,
+          error: error.message,
         };
         return response;
       } finally {
         client.release();
       }
     },
-    // Add mutation resolvers for saving vendorbillingaddresses, vendorshippingaddresses, and vendorcontactperson
+    // Add mutation resolvers for saving vendor_billing_address, vendorshippingaddresses, and vendorcontactperson
   },
+
   Vendor: {
-    billing_address: async (parent, _, { db }) => {
+    vendor_billing_address: async (parent, _, { db }) => {
       try {
         const query = {
-          text: `SELECT address, city, state, country FROM vendoraddresses WHERE vendorid = $1 AND addresstype = 'billing'`,
+          text: `SELECT location, state, city, country, zipcode, isdefault FROM vendor_billing_address WHERE vendorid = $1 `,
           values: [parent.vendorid],
         };
         const result = await db.query(query.text, query.values);
-        return result.rows[0];
+
+        console.log('Billing Address Result:', result.rows);
+
+        return result.rows;
       } catch (error) {
+
+        console.error('Billing Address Resolver Error:', error);
+
         throw new Error("Failed to retrieve billing address");
       }
     },
-    shipping_address: async (parent, _, { db }) => {
+    Vendor_Shipping_Addresses: async (parent, _, { db }) => {
       try {
         const query = {
-          text: `SELECT address, city, state, country FROM vendoraddresses WHERE vendorid = $1 AND addresstype = 'shipping'`,
+          text: `SELECT location, state, city, country, zipcode, isdefault FROM vendor_shipping_addresses WHERE vendorid = $1 `,
           values: [parent.vendorid],
         };
         const result = await db.query(query.text, query.values);
-        return result.rows[0];
+        console.log('Shipping Addresses Result:', result.rows); 
+        return result.rows;
       } catch (error) {
+        console.error('Shipping Addresses Resolver Error:', error);
         throw new Error("Failed to retrieve shipping address");
       }
     },
-    vendor_contact_person: async (parent, _, { db }) => {
+    Vendor_Contact_Person: async (parent, _, { db }) => {
       try {
         const query = {
-          text: `SELECT cpfirstname, cplastname, cpemail, cpphone, cpjobrole FROM vendorcontactperson WHERE vendorid = $1`,
+          text: `SELECT cpfirstname, cplastname, cpemail, cpcontact, cpjobrole FROM vendor_contact_person WHERE vendorid = $1`,
           values: [parent.vendorid],
         };
         const result = await db.query(query.text, query.values);
-        return result.rows[0];
+        return result.rows;
       } catch (error) {
         throw new Error("Failed to retrieve vendor contact person");
       }
@@ -304,195 +464,3 @@ const resolvers = {
 
 module.exports = resolvers;
 
-
-// =====================================================================================================================================
-//   Mutation: {
-//     saveVendor: async (_, content) => {
-//       const client = await db.connect();
-
-//       try {
-//         await client.query('BEGIN');
-
-//         // SAVING VENDOR
-//         const saveVendorQuery = {
-//           text: `INSERT INTO vendor (userid, vendorid, vendor_type, vendor_name, firstname, middlename, lastname, category, work_phone, phone, email)
-//           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *;
-//           `,
-//           values: [content.name, content.first_name, content.middle_name, content.last_name, content.type, content.category, content.email, content.work_phone, content.phone],
-//         };
-//         console.log(content.name, content.first_name, content.middle_name, content.last_name, content.type, content.category, content.email, content.work_phone, content.phone);
-
-//         const vendorResult = await client.query(saveVendorQuery.text, saveVendorQuery.values);
-
-//         if (vendorResult.rowCount !== 1) {
-//           throw new Error('Failed to insert vendor');
-//         }
-
-//         const vendorId = vendorResult.rows[0].id;
-
-//         // SAVING VENDOR DETAILS
-//         // const saveVendorDetailsQuery = {
-//         //   text: `INSERT INTO vendor_details (currency, terms, amount, vendor_id) VALUES ($1, $2, $3, $4) RETURNING *`,
-//         //   values: [content.currency, content.terms, content.amount, vendorId],
-//         // };
-
-//         // const vendorDetailsResult = await client.query(saveVendorDetailsQuery.text, saveVendorDetailsQuery.values);
-
-//         // if (vendorDetailsResult.rowCount !== 1) {
-//         //   throw new Error('Failed to insert vendor details');
-//         // }
-
-//         // SAVING VENDOR ADDRESS
-//         const saveVendorAddressQuery = {
-//           text: `INSERT INTO vendor_address (billing_address, billing_city, billing_zip, billing_state, billing_country, shipping_address, shipping_city, shipping_zip, shipping_state, shipping_country, vendor_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *`,
-//           values: [content.billing_address, content.billing_city, content.billing_zip, content.billing_state, content.billing_country, content.billing_address, content.billing_city, content.billing_zip, content.billing_state, content.billing_country, vendorId],
-//         };
-
-//         const vendorAddressResult = await client.query(saveVendorAddressQuery.text, saveVendorAddressQuery.values);
-
-//         if (vendorAddressResult.rowCount !== 1) {
-//           throw new Error('Failed to insert vendor address');
-//         }
-
-//         // SAVING VENDOR CONTACT PERSON
-//         const saveVendorContactPersonQuery = {
-//           text: `INSERT INTO vendor_contact_person (contact_first_name, contact_last_name, contact_email, contact_phone, contact_job_role, vendor_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-//           values: [content.contact_first_name, content.contact_last_name, content.contact_email, content.contact_phone, content.contact_job_role, vendorId],
-//         };
-
-//         const vendorContactPersonResult = await client.query(saveVendorContactPersonQuery.text, saveVendorContactPersonQuery.values);
-
-//         if (vendorContactPersonResult.rowCount !== 1) {
-//           throw new Error('Failed to insert vendor contact person');
-//         }
-
-//         // Commit the transaction if all operations are successful
-//         await client.query('COMMIT');
-
-//         const response = {
-//           status: 'success',
-//           id: vendorId,
-//           // Include other response data as needed
-
-//           ...vendorResult.rows[0], // Include vendor data
-//           // ...vendorDetailsResult.rows[0], // Include vendor details data
-//           ...vendorAddressResult.rows[0], // Include vendor address data
-//           ...vendorContactPersonResult.rows[0], //
-
-//           addType: vendorAddressResult.rows[0].add_type,
-//           // contactFirstName: vendorContactPersonResult.rows[0].contact_first_name,
-//           // contactLastName: vendorContactPersonResult.rows[0].contact_last_name,
-//           // contactEmail: vendorContactPersonResult.rows[0].contact_email,
-//           // contactPhone: vendorContactPersonResult.rows[0].contact_phone,
-//           // contactJobRole: vendorContactPersonResult.rows[0].contact_job_role,
-//         };
-
-//         return response;
-//       } catch (error) {
-//         await client.query('ROLLBACK');
-//         throw error;
-//       } finally {
-//         // Release the client back to the pool
-//         client.release();
-//       }
-//     },
-//   },
-// };
-// =====================================================================================================================================================================================
-
-
-
-// const { randomBytes } = require("crypto");
-// const { db } = require("../../db/index");
-
-// const resolvers = {
-//   Query: {
-//     getVendors: () => {
-//       // Implement logic to fetch vendors data
-//       return getVendorsData(); // Some function to fetch vendors data
-//     },
-//     getVendor: (_, { id }) => {
-//       // Implement logic to fetch a specific vendor data based on ID
-//       return getVendorData(id); // Some function to fetch specific vendor data
-//     },
-//   },
-//   Mutation: {
-//     saveVendor: async (_,content) => {
-//       const client = await db.connect();
-
-//       try {
-//         await client.query('BEGIN');
-
-//         const id = randomBytes(5).toString("hex");
-
-//         const {
-//           Name,
-//           first_name,
-//           middle_name,
-//           last_name,
-//           type,
-//           category,
-//           email,
-//           work_phone,
-//           phone,
-//           billing_address,
-//           shipping_address,
-//           contact_first_name,
-//           contact_last_name,
-//           contact_email,
-//           contact_phone,
-//           contact_job_role,
-//         } = content;
-
-//         const saveVendorQuery = {
-//           text: `INSERT INTO Vendor (id, name, first_name, middle_name, last_name, type, category, email, work_phone, phone ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`,
-//           values: [id, Name, first_name, middle_name, last_name, type, category, email, work_phone, phone],
-//         };
-
-//         const vendorResult = await client.query(saveVendorQuery.text, saveVendorQuery.values);
-
-//         if (vendorResult.rowCount !== 1) {
-//           throw new Error('Failed to insert vendor');
-//         }
-
-//         const vendorId = vendorResult.rows[0].id;
-
-//         // ... other operations for vendor details, vendor address, and vendor contact person
-//         // You need to implement similar database operations for these fields as well
-
-//         // Commit the transaction if all operations are successful
-//         await client.query('COMMIT');
-
-//         return {
-//           status: 'success',
-//           id: vendorId,
-//           name: Name,
-//           first_name,
-//           middle_name,
-//           last_name,
-//           type,
-//           category,
-//           email,
-//           work_phone,
-//           phone,
-//           billing_address,
-//           shipping_address,
-//           vendor_contact_person: {
-//             contact_first_name,
-//             contact_last_name,
-//             contact_email,
-//             contact_phone,
-//             contact_job_role,
-//           },
-//         };
-//       } catch (error) {
-//         await client.query('ROLLBACK');
-//         throw error;
-//       } finally {
-//         client.release();
-//       }
-//     },
-//   },
-// };
-
-// module.exports = resolvers;

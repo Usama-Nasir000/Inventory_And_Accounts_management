@@ -1,7 +1,3 @@
-
-// import { InputCustomer } from "../../models/Customer"
-// import { QueryConfig } from "../types/query-config"
-const { log } = require("console");
 const { db } = require("../../db/index")
 
 const resolvers = {
@@ -10,41 +6,66 @@ const resolvers = {
       try {
         const query = {
           text: `
-              SELECT
-              c.id,
-              c.name,
-              c.first_name,
-              c.middle_name,
-              c.last_name,
-              c.category,
-              c.phone,
-              c.work_phone,
-              c.type,
-              c.email,
-              cd.currency,
-              cd.terms,
-              cd.amount,
-              ca.billing_address,
-              ca.billing_city,
-              ca.billing_zip,
-              ca.billing_state,
-              ca.billing_country,
-              ca.shipping_address,
-              ca.shipping_city,
-              ca.shipping_zip,
-              ca.shipping_state,
-              ca.shipping_country,
-              ccp.contact_first_name,
-              ccp.contact_last_name,
-              ccp.contact_email,
-              ccp.contact_phone,
-              ccp.contact_job_role
-              FROM customers AS c
-              INNER JOIN customer_details AS cd ON c.id = cd.customer_id
-              INNER JOIN customer_address AS ca ON c.id = ca.customer_id
-              INNER JOIN customer_contact_person AS ccp ON c.id = ccp.customer_id
-              WHERE c.id = $1;
-      
+          SELECT 
+          Customer.UserID,
+          Customer.CustomerID,
+          Customer.category,
+          Customer.company_name,
+          Customer.Email,
+          Customer.main_phone,
+          Customer.work_phone,
+          Customer.first_name,
+          Customer.middle_name,
+          Customer.last_name,
+          Customer.display_name,
+          Customer.Website,
+          Customer.Amount,
+          Customer.Currency,
+          Customer.payment_terms,
+          ARRAY_AGG(DISTINCT JSONB_BUILD_OBJECT(
+              'billing_location', CustomerBillingAddresses.location,
+              'billing_state', CustomerBillingAddresses.State,
+              'billing_city', CustomerBillingAddresses.City,
+              'billing_country', CustomerBillingAddresses.Country,
+              'billing_zipcode', CustomerBillingAddresses.ZipCode,
+              'billing_isdefault', CustomerBillingAddresses.IsDefault
+          )) AS billing_addresses,
+          ARRAY_AGG(DISTINCT JSONB_BUILD_OBJECT(
+              'shipping_location', CustomerShippingAddresses.location,
+              'shipping_state', CustomerShippingAddresses.State,
+              'shipping_city', CustomerShippingAddresses.City,
+              'shipping_country', CustomerShippingAddresses.Country,
+              'shipping_zipcode', CustomerShippingAddresses.ZipCode,
+              'shipping_isdefault', CustomerShippingAddresses.IsDefault
+          )) AS shipping_addresses,
+          ARRAY_AGG(DISTINCT JSONB_BUILD_OBJECT(
+              'contact_first_name', CustomerContactPerson.CPFirstName,
+              'contact_last_name', CustomerContactPerson.CPLastName,
+              'contact_email', CustomerContactPerson.CPEmail,
+              'contact_phone', CustomerContactPerson.CPcontact,
+              'contact_job_role', CustomerContactPerson.CPJobRole
+          )) AS contact_persons
+      FROM Customer
+      LEFT JOIN CustomerBillingAddresses ON Customer.CustomerID = CustomerBillingAddresses.CustomerID
+      LEFT JOIN CustomerShippingAddresses ON Customer.CustomerID = CustomerShippingAddresses.CustomerID
+      LEFT JOIN CustomerContactPerson ON Customer.CustomerID = CustomerContactPerson.CustomerID
+      where customer.customerid = $1
+      GROUP BY 
+          Customer.UserID,
+          Customer.CustomerID,
+          Customer.category,
+          Customer.company_name,
+          Customer.Email,
+          Customer.main_phone,
+          Customer.work_phone,
+          Customer.first_name,
+          Customer.middle_name,
+          Customer.last_name,
+          Customer.display_name,
+          Customer.Website,
+          Customer.Amount,
+          Customer.Currency,
+          Customer.payment_terms;
           `,
           values: [id],
         };
@@ -84,39 +105,65 @@ const resolvers = {
       try {
         const query = {
           text: `
-            SELECT
-            c.id,
-            c.name,
-            c.first_name,
-            c.middle_name,
-            c.last_name,
-            c.category,
-            c.phone,
-            c.work_phone,
-            c.type,
-            c.email,
-            cd.currency,
-            cd.terms,
-            cd.amount,
-            ca.billing_address,
-            ca.billing_city,
-            ca.billing_zip,
-            ca.billing_state,
-            ca.billing_country,
-            ca.shipping_address,
-            ca.shipping_city,
-            ca.shipping_zip,
-            ca.shipping_state,
-            ca.shipping_country,
-            ccp.contact_first_name,
-            ccp.contact_last_name,
-            ccp.contact_email,
-            ccp.contact_phone,
-            ccp.contact_job_role
-          FROM customers AS c
-          INNER JOIN customer_details AS cd ON c.id = cd.customer_id
-          INNER JOIN customer_address AS ca ON c.id = ca.customer_id
-          INNER JOIN customer_contact_person AS ccp ON c.id = ccp.customer_id;
+          SELECT 
+          Customer.UserID,
+          Customer.CustomerID,
+          Customer.category,
+          Customer.company_name,
+          Customer.Email,
+          Customer.main_phone,
+          Customer.work_phone,
+          Customer.first_name,
+          Customer.middle_name,
+          Customer.last_name,
+          Customer.display_name,
+          Customer.Website,
+          Customer.Amount,
+          Customer.Currency,
+          Customer.payment_terms,
+          ARRAY_AGG(DISTINCT JSONB_BUILD_OBJECT(
+              'billing_location', CustomerBillingAddresses.location,
+              'billing_state', CustomerBillingAddresses.State,
+              'billing_city', CustomerBillingAddresses.City,
+              'billing_country', CustomerBillingAddresses.Country,
+              'billing_zipcode', CustomerBillingAddresses.ZipCode,
+              'billing_isdefault', CustomerBillingAddresses.IsDefault
+          )) AS billing_addresses,
+          ARRAY_AGG(DISTINCT JSONB_BUILD_OBJECT(
+              'shipping_location', CustomerShippingAddresses.location,
+              'shipping_state', CustomerShippingAddresses.State,
+              'shipping_city', CustomerShippingAddresses.City,
+              'shipping_country', CustomerShippingAddresses.Country,
+              'shipping_zipcode', CustomerShippingAddresses.ZipCode,
+              'shipping_isdefault', CustomerShippingAddresses.IsDefault
+          )) AS shipping_addresses,
+          ARRAY_AGG(DISTINCT JSONB_BUILD_OBJECT(
+              'contact_first_name', CustomerContactPerson.CPFirstName,
+              'contact_last_name', CustomerContactPerson.CPLastName,
+              'contact_email', CustomerContactPerson.CPEmail,
+              'contact_phone', CustomerContactPerson.CPcontact,
+              'contact_job_role', CustomerContactPerson.CPJobRole
+          )) AS contact_persons
+      FROM Customer
+      LEFT JOIN CustomerBillingAddresses ON Customer.CustomerID = CustomerBillingAddresses.CustomerID
+      LEFT JOIN CustomerShippingAddresses ON Customer.CustomerID = CustomerShippingAddresses.CustomerID
+      LEFT JOIN CustomerContactPerson ON Customer.CustomerID = CustomerContactPerson.CustomerID
+      GROUP BY 
+          Customer.UserID,
+          Customer.CustomerID,
+          Customer.category,
+          Customer.company_name,
+          Customer.Email,
+          Customer.main_phone,
+          Customer.work_phone,
+          Customer.first_name,
+          Customer.middle_name,
+          Customer.last_name,
+          Customer.display_name,
+          Customer.Website,
+          Customer.Amount,
+          Customer.Currency,
+          Customer.payment_terms;
           `,
         };
 
@@ -129,7 +176,6 @@ const resolvers = {
             count: result.rowCount,
             data: result.rows,
           };
-
           return response;
         } else {
           const response = {
@@ -138,39 +184,73 @@ const resolvers = {
             count: 0,
             data: null,
           };
-
           return response;
         }
       } catch (error) {
-
-
-        const response = {
+          const response = {
           code: 500,
           status: 'error',
           count: 0,
           data: null
         };
-
         return response;
       }
     },
-
-
-
   },
-  Mutation: {
 
+
+  Mutation: {
     saveCustomer: async (_, content) => {
       const client = await db.connect();
-
+      console.log("connection build on customer resolver");
+      console.log("Content in customerResolver:  ", content);
+      let response;
       try {
         // Begin a transaction
         await client.query('BEGIN');
 
         // SAVING CUSTOMER
         const saveCustomerQuery = {
-          text: `INSERT INTO customers (name, first_name, middle_name, last_name, type, category, email, work_phone, phone ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
-          values: [content.name, content.first_name, content.middle_name, content.last_name, content.type, content.category, content.email, content.work_phone, content.phone],
+          text: `
+           INSERT INTO customer (
+            userid,
+            customerid,
+            category,
+            company_name,
+            email,
+            main_phone,
+            work_phone,
+            first_name,
+            middle_name,
+            last_name,
+            display_name,
+            website,
+            amount,
+            currency,
+            payment_terms
+          )
+          VALUES (
+            $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15
+          )
+          RETURNING *;
+          `,
+          values: [
+            content.userid,
+            content.customerid,
+            content.category,
+            content.company_name,
+            content.email,
+            content.main_phone,
+            content.work_phone,
+            content.first_name,
+            content.middle_name,
+            content.last_name,
+            content.display_name,
+            content.website,
+            content.amount,
+            content.currency,
+            content.payment_terms,
+          ],
         };
 
         const customerResult = await client.query(saveCustomerQuery.text,
@@ -180,38 +260,110 @@ const resolvers = {
           throw new Error('Failed to insert customer');
         }
 
-        const customerId = customerResult.rows[0].id;
+        // SAVING CUSTOMER Billing ADDRESS
+        for (const CustomerBillingAddress of content.billing_address) {
+          const saveCustomerAddressQuery = {
+            text: `
+              INSERT INTO CustomerBillingAddresses (
+                UserID,
+                CustomerID,
+                location,
+                State,
+                City,
+                Country,
+                ZipCode,
+                IsDefault
+              )
+              VALUES (
+                $1, $2, $3, $4, $5, $6, $7, $8
+              )
+              RETURNING *;
+            `,
+            values: [
+              content.userid,
+              content.customerid,
+              CustomerBillingAddress.location,
+              CustomerBillingAddress.state,
+              CustomerBillingAddress.city,
+              CustomerBillingAddress.country,
+              CustomerBillingAddress.zipcode,
+              CustomerBillingAddress.isdefault,
+            ],
+          };
 
-        // SAVING CUSTOMER DETAILS
-        const saveCustomerDetailsQuery = {
-          text: `INSERT INTO customer_details (currency, terms, amount, customer_id) VALUES ($1, $2, $3, $4) RETURNING *`,
-          values: [content.currency, content.terms, content.amount, customerId],
-        };
+        }
+        const customerBillingAddressResult = await client.query(saveCustomerAddressQuery.text, saveCustomerAddressQuery.values);
 
-        const customerDetailsResult = await client.query(saveCustomerDetailsQuery.text, saveCustomerDetailsQuery.values);
+        if (customerBillingAddressResult.rowCount !== 1) {
+          throw new Error('Failed to insert customer billing address');
+      }
 
-        if (customerDetailsResult.rowCount !== 1) {
-          throw new Error('Failed to insert customer details');
+        //Save Customer Shipping Address
+        for(const CustomerShippingAddress of content.shipping_address){
+          const saveCustomerShippingAddressQuery ={
+            text: `
+            INSERT INTO customershippingaddresses(
+              UserID,
+              CustomerID,
+              location,
+              State,
+              City,
+              Country,
+              ZipCode,
+              IsDefault
+            )
+            VALUES (
+              $1, $2, $3, $4, $5, $6, $7, $8
+            )
+            RETURNING *;
+            `,
+            values:[
+              content.userid,
+              content.customerid,
+              CustomerShippingAddress.location,
+              CustomerShippingAddress.state,
+              CustomerShippingAddress.city,
+              CustomerShippingAddress.country,
+              CustomerShippingAddress.zipcode,
+              CustomerShippingAddress.isdefault,
+            ],
+          };
+        }
+        const CustomerShippingAddressResult = await client.query(saveCustomerShippingAddressQuery.text,saveCustomerShippingAddressQuery.values);
+
+        if(CustomerShippingAddressResult !== 1){
+          throw new Error('Failed to Insert Customer Shipping Address');
         }
 
-        // SAVING CUSTOMER ADDRESS
-        const saveCustomerAddressQuery = {
-          text: `INSERT INTO customer_address (billing_address, billing_city, billing_zip, billing_state, billing_country, shipping_address, shipping_city, shipping_zip, shipping_state, shipping_country, customer_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *`,
-          values: [content.billing_address, content.billing_city, content.billing_zip, content.billing_state, content.billing_country, content.billing_address, content.billing_city, content.billing_zip, content.billing_state, content.billing_country, customerId],
-        };
+         for (const CustomerContactPerson of content.customer_contact_person) {
+          const saveContactPersonQuery = {
+            text: `
+            INSERT INTO customerContactPerson (
+              UserID,
+              CustomerID,
+              CPFirstName,
+              CPLastName,
+              CPEmail,
+              CPContact,
+              CPJobRole
+            )
+            VALUES (
+              $1, $2, $3, $4, $5, $6, $7
+            )
+            RETURNING *;
+            `,
+            values: [
+              content.userid,
+              content.customerid,
+              CustomerContactPerson.contact_first_name,
+              CustomerContactPerson.contact_last_name,
+              CustomerContactPerson.contact_email,
+              CustomerContactPerson.contact_phone,
+              CustomerContactPerson.contact_job_role,
+            ],
+          };
 
-        const customerAddressResult = await client.query(saveCustomerAddressQuery.text, saveCustomerAddressQuery.values);
-
-        if (customerAddressResult.rowCount !== 1) {
-          throw new Error('Failed to insert customer address');
         }
-
-        // SAVING CUSTOMER CONTACT PERSON
-        const saveCustomerContactPersonQuery = {
-          text: `INSERT INTO customer_contact_person (contact_first_name, contact_last_name, contact_email, contact_phone, contact_job_role, customer_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-          values: [content.contact_first_name, content.contact_last_name, content.contact_email, content.contact_phone, content.contact_job_role, customerId],
-        };
-
         const customerContactPersonResult = await client.query(saveCustomerContactPersonQuery.text, saveCustomerContactPersonQuery.values);
 
         if (customerContactPersonResult.rowCount !== 1) {
@@ -221,33 +373,80 @@ const resolvers = {
         // Commit the transaction if all operations are successful
         await client.query('COMMIT');
 
-
-        const response = {
+        response = {
           status: 'success',
-          id: customerId,
-
+          id: content.customerid,
           ...customerResult.rows[0],
-          ...customerDetailsResult.rows[0],
-          ...customerAddressResult.rows[0],
-          ...customerContactPersonResult.rows[0],
+          ...customerBillingAddressResult.rows[0],
+          ...CustomerShippingAddressResult.rowCount,
+          ...customerContactPersonResult.rowCount,
+          // ...customerBillingAddressResult.rows[0],
+          // ...CustomerShippingAddressResult.rows[0],
+          // ...customerContactPersonResult.rows[0],
+
 
         };
 
         return response;
-      } catch (error) {
+      } catch  (error) {
 
         await client.query('ROLLBACK');
-        throw error;
+        const response ={
+          code: 200,
+          status:'success',
+          data: customerResult?.rows[0] || null,
+        };
+        return response;
+        // throw error;
       } finally {
-
         client.release();
       }
     },
+  },
 
+  Customer: {
+    billing_address: async (parent, _, { db }) => {
+      try {
+        const query = {
+          text: `SELECT location, state, city, country, zipcode, isdefault FROM customerbillingaddresses WHERE customerid = $1 `,
+          values: [parent.customerid],
+        };
+        const result = await db.query(query.text, query.values);
 
+        console.log('Billing Address Result:', result.rows); 
 
+        return [result.rows[0]];
+      } catch (error) {
+        
+        console.error('Billing Address Resolver Error:', error);
 
-
+        throw new Error("Failed to retrieve billing address");
+      }
+    },
+    shipping_address: async (parent, _, { db }) => {
+      try {
+        const query = {
+          text: `SELECT location, city, state, country FROM customershippingaddresses WHERE customerid = $1 `,
+          values: [parent.customerid],
+        };
+        const result = await db.query(query.text, query.values);
+        return result.rows[0];
+      } catch (error) {
+        throw new Error("Failed to retrieve shipping address");
+      }
+    },
+    customer_contact_person: async (parent, _, { db }) => {
+      try {
+        const query = {
+          text: `SELECT cpfirstname, cplastname, cpemail, cpcontact, cpjobrole FROM customercontactperson WHERE customerid = $1`,
+          values: [parent.customerid],
+        };
+        const result = await db.query(query.text, query.values);
+        return result.rows[0];
+      } catch (error) {
+        throw new Error("Failed to retrieve customer contact person");
+      }
+    },
   },
 };
 

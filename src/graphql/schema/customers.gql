@@ -1,27 +1,69 @@
+type BillingAddress {
+  location: String
+  state: String
+  city: String
+  country: String
+  zipcode: String
+  isdefault: Boolean
+}
+
+type ShippingAddress {
+  location: String
+  state: String
+  city: String
+  country: String
+  zipcode: String
+  isdefault: Boolean
+}
+
+type CustomerContactPerson {
+  contact_first_name: String
+  contact_last_name: String
+  contact_email: String
+  contact_phone: String
+  contact_job_role: String
+}
+
 type Customer {
-  id: ID!
-  name: String
+  userid: Int
+  customerid: Int
+  category: String
+  company_name: String
+  email: String
+  main_phone: String
+  work_phone: String
   first_name: String
   middle_name: String
   last_name: String
-  type: String
-  category: String
-  email: String
-  work_phone: String
-  phone: String
+  display_name: String
+  website: String
+  amount: String
   currency: String
-  terms: String
-  amount: Float
-  billing_address: String
-  billing_city: String
-  billing_zip: Float
-  billing_state: String
-  billing_country: String
-  shipping_address: String
-  shipping_city: String
-  shipping_zip: Float
-  shipping_state: String
-  shipping_country: String
+  payment_terms: String
+  billing_address: [BillingAddress]
+  shipping_address: [ShippingAddress]
+  customer_contact_person: [CustomerContactPerson]
+}
+
+input BillingAddressInput {
+  location: String
+  state: String
+  city: String
+  country: String
+  zipcode: String
+  isdefault: Boolean
+}
+
+input ShippingAddressInput {
+  location: String
+  state: String
+  city: String
+  country: String
+  zipcode: String
+  isdefault: Boolean
+}
+
+input CustomerContactPersonInput {
   contact_first_name: String
   contact_last_name: String
   contact_email: String
@@ -29,83 +71,40 @@ type Customer {
   contact_job_role: String
 }
 
-type getCustomers {
-  id: ID!
-  name: String
-  first_name: String
-  middle_name: String
-  last_name: String
-  type: String
-  category: String
-  email: String
-  work_phone: String
-  phone: String
-  currency: String
-  terms: String
-  amount: Float
-  billing_address: String
-  billing_city: String
-  billing_zip: Float
-  billing_state: String
-  billing_country: String
-  shipping_address: String
-  shipping_city: String
-  shipping_zip: Float
-  shipping_state: String
-  shipping_country: String
-  contact_first_name: String
-  contact_last_name: String
-  contact_email: String
-  contact_phone: String
-  contact_job_role: String
-}
-
-type getCustomersResponse {
+type GetCustomerResponse {
   code: Int
   status: String
-  data: getCustomers
+  data: Customer
 }
 
-type getCustomerListResponse {
-  code: Int
-  status: String
-  count: Int
-  data: [getCustomers]
+type GetCustomerListResponse {
+  data: [Customer]
 }
 
 type Query {
-  getCustomers: getCustomerListResponse
-  getCustomer(id: ID!): getCustomersResponse
+  getCustomers: GetCustomerListResponse
+  getCustomer(id: ID!): GetCustomerResponse
 }
 
 type Mutation {
   saveCustomer(
-    name: String
+    userid: Int
+    customerid: Int
+    category: String
+    company_name: String
+    email: String
+    main_phone: String
+    work_phone: String
     first_name: String
     middle_name: String
     last_name: String
-    type: String
-    category: String
-    email: String
-    work_phone: String
-    phone: String
+    display_name: String
+    website: String
+    amount: String
     currency: String
-    terms: String
-    amount: Float
-    billing_address: String
-    billing_city: String
-    billing_zip: Float
-    billing_state: String
-    billing_country: String
-    shipping_address: String
-    shipping_city: String
-    shipping_zip: Float
-    shipping_state: String
-    shipping_country: String
-    contact_first_name: String
-    contact_last_name: String
-    contact_email: String
-    contact_phone: String
-    contact_job_role: String
+    payment_terms: String
+    billing_address: [BillingAddressInput]
+    shipping_address: [ShippingAddressInput]
+    customer_contact_person: [CustomerContactPersonInput]
   ): Customer
 }
