@@ -1,29 +1,3 @@
-type BillingAddress {
-  location: String
-  state: String
-  city: String
-  country: String
-  zipcode: String
-  isdefault: Boolean
-}
-
-type ShippingAddress {
-  location: String
-  state: String
-  city: String
-  country: String
-  zipcode: String
-  isdefault: Boolean
-}
-
-type CustomerContactPerson {
-  contact_first_name: String
-  contact_last_name: String
-  contact_email: String
-  contact_phone: String
-  contact_job_role: String
-}
-
 type Customer {
   userid: Int
   customerid: Int
@@ -40,12 +14,12 @@ type Customer {
   amount: String
   currency: String
   payment_terms: String
-  billing_address: [BillingAddress]
-  shipping_address: [ShippingAddress]
+  customer_billing_address: [CustomerBillingAddress]
+  customer_shipping_addresses: [CustomerShippingAddress]
   customer_contact_person: [CustomerContactPerson]
 }
 
-input BillingAddressInput {
+type CustomerBillingAddress {
   location: String
   state: String
   city: String
@@ -54,7 +28,35 @@ input BillingAddressInput {
   isdefault: Boolean
 }
 
-input ShippingAddressInput {
+type CustomerShippingAddress {
+  location: String
+  state: String
+  city: String
+  country: String
+  zipcode: String
+  isdefault: Boolean
+}
+
+type CustomerContactPerson {
+  contact_first_name: String
+  contact_last_name: String
+  contact_email: String
+  contact_phone: String
+  contact_job_role: String
+}
+
+input CustomerBillingAddressInput {
+  customerid:Int
+  location: String
+  state: String
+  city: String
+  country: String
+  zipcode: String
+  isdefault: Boolean
+}
+
+input CustomerShippingAddressInput {
+  customerid:Int
   location: String
   state: String
   city: String
@@ -64,6 +66,7 @@ input ShippingAddressInput {
 }
 
 input CustomerContactPersonInput {
+  customerid:Int
   contact_first_name: String
   contact_last_name: String
   contact_email: String
@@ -78,6 +81,8 @@ type GetCustomerResponse {
 }
 
 type GetCustomerListResponse {
+  code: Int
+  status: String
   data: [Customer]
 }
 
@@ -103,8 +108,8 @@ type Mutation {
     amount: String
     currency: String
     payment_terms: String
-    billing_address: [BillingAddressInput]
-    shipping_address: [ShippingAddressInput]
+    customer_billing_address: [CustomerBillingAddressInput]
+    customer_shipping_addresses: [CustomerShippingAddressInput]
     customer_contact_person: [CustomerContactPersonInput]
   ): Customer
 }

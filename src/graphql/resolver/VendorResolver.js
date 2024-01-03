@@ -72,8 +72,8 @@ const resolvers = {
         };
 
         const result = await db.query(query.text, query.values);
-        console.log("Result in Vendior resolver -------- ", JSON.stringify(result.rows));
-        console.log("ID in vendor resolver --------------", id);
+        console.log("Result in Vendor resolver -------- ", JSON.stringify(result.rows));
+        console.log("ID in Vendor resolver --------------", id);
 
         if (result.rowCount > 0) {
           const response = {
@@ -270,33 +270,32 @@ const resolvers = {
         }
 
         // Save vendor_billing_address
-        const billingAddress = content.vendor_billing_address;
+        const billingAddresses = content.vendor_billing_address;
+        for (const billingAddress of billingAddresses ) {
         const saveBillingAddressQuery = {
           text: `
             INSERT INTO vendor_billing_address (
-              UserID,
-              VendorID,
+              vendorid,
               location,
-              State,
-              City,
-              Country,
-              ZipCode,
-              IsDefault
+              state,
+              city,
+              country,
+              zipcode,
+              isdefault
             )
             VALUES (
-              $1, $2, $3, $4, $5, $6, $7, $8
+              $1, $2, $3, $4, $5, $6, $7
             )
             RETURNING *;
           `,
           values: [
-            content.userid,
             content.vendorid,
             billingAddress.location,
-            billingAddress.billing_state,
-            billingAddress.billing_city,
-            billingAddress.billing_country,
-            billingAddress.billing_zipcode,
-            billingAddress.billing_isdefault,
+            billingAddress.state,
+            billingAddress.city,
+            billingAddress.country,
+            billingAddress.zipcode,
+            billingAddress.isdefault,
           ],
         };
   
@@ -305,14 +304,14 @@ const resolvers = {
         if (vendorBillingAddressResult.rowCount !== 1) {
           throw new Error('Failed to insert Vendor Billing Address');
         }
-
+      };
 
         // Save VendorShippingAddresses
-        const shippingAddress = content.Vendor_Shipping_Addresses;
+        const shippingAddresses = content.vendor_shipping_addresses;
+        for (const shippingAddress of shippingAddresses){
         const saveShippingAddressQuery = {
           text: `
-            INSERT INTO VendorShippingAddresses (
-              UserID,
+            INSERT INTO Vendor_Shipping_Addresses (
               VendorID,
               location,
               State,
@@ -322,19 +321,18 @@ const resolvers = {
               IsDefault
             )
             VALUES (
-              $1, $2, $3, $4, $5, $6, $7, $8
+              $1, $2, $3, $4, $5, $6, $7
             )
             RETURNING *;
           `,
           values: [
-            content.userid,
             content.vendorid,
-            shippingAddress.shipping_location,
-            shippingAddress.shipping_state,
-            shippingAddress.shipping_city,
-            shippingAddress.shipping_country,
-            shippingAddress.shipping_zipcode,
-            shippingAddress.shipping_isdefault,
+            shippingAddress.location,
+            shippingAddress.state,
+            shippingAddress.city,
+            shippingAddress.country,
+            shippingAddress.zipcode,
+            shippingAddress.isdefault,
           ],
         };
   
@@ -343,16 +341,15 @@ const resolvers = {
         if (vendorShippingAddressResult.rowCount !== 1) {
           throw new Error('Failed to insert Vendor Shipping Address');
         }
-
+      };
 
 
         // Save VendorContactPerson
-        const contactPersons = content.Vendor_Contact_Person;
-        for (const contactPerson of contactPersons) {
+        const contactPersons = content.vendor_contact_person;
+        for (const contactPerson of contactPersons){
           const saveContactPersonQuery = {
             text: `
-              INSERT INTO VendorContactPerson (
-                UserID,
+              INSERT INTO Vendor_Contact_Person (
                 VendorID,
                 CPFirstName,
                 CPLastName,
@@ -361,12 +358,11 @@ const resolvers = {
                 CPJobRole
               )
               VALUES (
-                $1, $2, $3, $4, $5, $6, $7
+                $1, $2, $3, $4, $5, $6
               )
               RETURNING *;
             `,
             values: [
-              content.userid,
               content.vendorid,
               contactPerson.contact_first_name,
               contactPerson.contact_last_name,
@@ -381,7 +377,7 @@ const resolvers = {
           if (vendorContactPersonResult.rowCount !== 1) {
             throw new Error('Failed To Insert Vendor Contact Person')
           }
-        }
+        };
 
          response = {
         code: 200,
@@ -396,6 +392,7 @@ const resolvers = {
         // Commit the transaction if everything is successful
         await client.query('COMMIT');
 
+        console.log("Transaction Successful")
         return response;
       }catch (error) {
         console.log(error);
@@ -461,6 +458,5 @@ const resolvers = {
     },
   },
 };
-
 module.exports = resolvers;
 
