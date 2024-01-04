@@ -1,4 +1,4 @@
-const { error } = require("console");
+// const { error } = require("console");
 const { db } = require("../../db/index");
 
 const resolvers = {

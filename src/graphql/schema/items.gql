@@ -1,31 +1,18 @@
 type Item {
-  id: ID!
-  name: String
-  code: String
-  price: Float
+  userid: Int
+  itemid: Int
+  item_image: String
+  item_name: String
+  item_code: String
   category: String
   status: String
+  purchase_price: Float 
+  sales_price: Float
+  stock_quantity: Int
+  income_account: String
   cogs_account: String
   inventory_account: String
-  income_account: String
-  selected_costing_option: String
-  selected_vendor: String
-  drop_shipping: Boolean
-  purchase_description: String
-  selected_locations: [String]
-  sales_description: String
-  sales_price: Float
-  price_level_name: String
-  qty_1: Int
-  price_1: Float
-  qty_2: Int
-  price_2: Float
-  qty_3: Int
-  price_3: Float
-  qty_4: Int
-  price_4: Float
-  qty_5: Int
-  price_5: Float
+  currency: String
 }
 
 type getItemsResponse {
@@ -37,7 +24,6 @@ type getItemsResponse {
 type getItemListResponse {
   code: Int
   status: String
-  count: Int
   data: [Item]
 }
 
@@ -48,31 +34,19 @@ type Query {
 
 type Mutation {
   saveItem(
-    name: String
-    code: String
-    price: Float
+    userid: Int
+    itemid: Int
+    item_image: String
+    item_name: String
+    item_code: String
     category: String
     status: String
+    purchase_price: Float 
+    sales_price: Float
+    stock_quantity: Int
+    income_account: String
     cogs_account: String
     inventory_account: String
-    income_account: String
-    selected_costing_option: String
-    selected_vendor: String
-    drop_shipping: Boolean
-    purchase_description: String
-    selected_locations: [String]
-    sales_description: String
-    sales_price: Float
-    price_level_name: String
-    qty_1: Int
-    price_1: Float
-    qty_2: Int
-    price_2: Float
-    qty_3: Int
-    price_3: Float
-    qty_4: Int
-    price_4: Float
-    qty_5: Int
-    price_5: Float
+    currency: String
   ): Item
 }
