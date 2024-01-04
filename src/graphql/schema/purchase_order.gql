@@ -1,0 +1,68 @@
+type PurchaseOrder {
+  purchase_order_id: Int 
+  userid: Int
+  vendor_id: Int 
+  vendor_name: String 
+  purchase_description: String 
+  order_date: String 
+  expected_date: String 
+  currency: String 
+  amount: Float 
+  total_discount: Float 
+  payment_due: String 
+  purchase_items: [PurchaseOrderQuantity] 
+}
+
+type PurchaseOrderQuantity {
+  item_id: Int
+  item_name: String
+  purchase_quantity: Int
+  item_price: Float
+  item_discount: Float
+}
+
+input PurchaseOrderInput {
+  userid: Int
+  purchase_order_id: Int
+  vendor_id: Int 
+  vendor_name: String 
+  purchase_description: String 
+  order_date: String 
+  expected_date: String 
+  currency: String 
+  amount: Float 
+  total_discount: Float 
+  payment_due: String 
+  purchase_items: [PurchaseOrderQuantityInput] 
+}
+
+input PurchaseOrderQuantityInput {
+  item_id: Int
+  item_name: String
+  purchase_quantity: Int
+  item_price: Float
+  item_discount: Float
+}
+
+type GetPurchaseOrderResponse {
+  code: Int
+  status: String
+  data: PurchaseOrder
+}
+
+type GetPurchaseOrderListResponse {
+  code: Int
+  status: String
+  count: Int
+  data: [PurchaseOrder]
+}
+
+type Query {
+  getPurchaseOrders: GetPurchaseOrderListResponse
+  getPurchaseOrder(id: ID !): GetPurchaseOrderResponse
+}
+
+type Mutation {
+  savePurchaseOrder(input: PurchaseOrderInput): PurchaseOrder
+}
+

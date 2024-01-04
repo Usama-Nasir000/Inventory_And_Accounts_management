@@ -9,7 +9,6 @@ type SalesOrder {
   amount: Float
   total_discount: Float
   payment_due: String
-  # customer: SelectedCustomer!
   sales_items: [SalesOrderQuantity!]
 }
 
@@ -39,7 +38,6 @@ input SalesOrderInput {
   total_discount: Float
   payment_due: String
   sales_items: [SalesOrderQuantityInput]
-  # customer: SelectedCustomerInput!
 }
 
 input SalesOrderQuantityInput {

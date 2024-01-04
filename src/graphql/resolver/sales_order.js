@@ -1,7 +1,5 @@
-const id = require("faker/lib/locales/id_ID");
 const { db } = require("../../db/index");
-const { error } = require("console");
-const { ne } = require("faker/lib/locales");
+
 
 const resolver = {
     Query: {
@@ -120,7 +118,7 @@ const resolver = {
                     `,
                 };
                 const result = await db.query(query.text);
-        
+
                 if (result.rowCount > 0) {
                     const response = {
                         code: 200,
@@ -129,7 +127,7 @@ const resolver = {
                         data: result.rows,
                     };
                     console.log(response);
-        
+
                     return response;
                 } else {
                     const response = {
@@ -138,7 +136,7 @@ const resolver = {
                         count: 0,
                         data: null,
                     };
-        
+
                     return response;
                 }
             } catch (error) {
@@ -152,7 +150,7 @@ const resolver = {
                 return response;
             }
         },
-        
+
     },
 
     Mutation: {
@@ -169,35 +167,36 @@ const resolver = {
 
                 const saveSalesOrderQuery = {
                     text: `
-                      INSERT INTO sales_order (
-                        sales_order_id,
-                        customerid,
-                        display_name,
-                        sales_description,
+                      INSERT INTO purchase_order (
+                        purchase_order_id,
+                        vendor_id,
+                        vendor_name,
+                        purchase_description,
                         order_date,
                         expected_date,
                         currency,
                         amount,
                         total_discount,
                         payment_due,
-                        userid
+                        userid,
                       )
                       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
                       RETURNING *;
                     `,
                     values: [
-                        input.sales_order_id,
-                        input.customerid,
-                        input.display_name,
-                        input.sales_description,
+                        input.purchase_order_id,
+                        input.vendor_id,
+                        input.vendor_name,
+                        input.purchase_description,
                         input.order_date,
                         input.expected_date,
                         input.currency,
                         input.amount,
                         input.total_discount,
-                        input.payment_due,
+                        input.payment_due,  // <-- add a comma here
                         input.userid,
                     ],
+
                 };
 
                 salesOrderResult = await db.query(saveSalesOrderQuery.text, saveSalesOrderQuery.values);
@@ -208,7 +207,7 @@ const resolver = {
 
                 //Save Sales Items
 
-                const SalesItems = input.quantity;
+                const SalesItems = input.sales_items;//                const SalesItems = input.quantity;
                 for (const SalesItem of SalesItems) {
                     const saveSalesItemQuery = {
                         text: `
