@@ -1,0 +1,120 @@
+type SalesOrder {
+  sales_order_id: Int
+  customerid: Int
+  display_name: String
+  sales_description: String
+  order_date: String
+  expected_date: String
+  currency: String
+  amount: Float
+  total_discount: Float
+  payment_due: String
+  # customer: SelectedCustomer!
+  sales_items: [SalesOrderQuantity!]
+}
+
+type SalesOrderQuantity {
+  item_id: Int
+  item_name: String
+  sold_quantity: Int
+  item_price: Float
+  item_discount: Float
+}
+
+type SelectedCustomer {
+  customerid: Int
+  display_name: String
+}
+
+input SalesOrderInput {
+  sales_order_id: Int
+  userid:Int
+  customerid: Int
+  display_name: String
+  sales_description: String
+  order_date: String
+  expected_date: String
+  currency: String
+  amount: Float
+  total_discount: Float
+  payment_due: String
+  sales_items: [SalesOrderQuantityInput]
+  # customer: SelectedCustomerInput!
+}
+
+input SalesOrderQuantityInput {
+  item_id: Int
+  item_name: String
+  sold_quantity: Int
+  item_price: Float
+  item_discount: Float
+}
+
+input SelectedCustomerInput {
+  customerid: Int
+  customer_name: String
+}
+
+type GetSalesOrderResponse {
+  code: Int
+  status: String
+  data: SalesOrder
+}
+
+type GetSalesOrderListResponse {
+  code: Int
+  status: String
+  count:Int
+  data: [SalesOrder]
+}
+
+type Query {
+  getSalesOrders: GetSalesOrderListResponse
+  getSalesOrder(id: ID!): GetSalesOrderResponse
+}
+
+type Mutation {
+  saveSalesOrder(input: SalesOrderInput): SalesOrder
+}
+
+
+
+# type SalesOrder {
+#   sales_order_id: ID
+#   customer: Customer       # Reference to the customer
+#   sales_description: String
+#   order_date: String
+#   expected_date: String
+#   currency: String
+#   amount: Float
+#   total_discount: Float
+#   payment_due: String!
+#   quantity: [SalesOrderQuantity!]!
+# }
+
+# input SalesOrderInput {
+#   customer_id: Int!        # Instead of customer_name, use customer_id
+#   sales_description: String
+#   order_date: String
+#   expected_date: String
+#   currency: String
+#   amount: Float
+#   total_discount: Float
+#   payment_due: String!
+#   quantity: [SalesOrderQuantityInput!]!
+# }
+
+# type GetSalesOrderResponse {
+#   code: Int
+#   status: String
+#   data: SalesOrder
+# }
+
+# type Query {
+#   getSalesOrders: GetSalesOrderListResponse
+#   getSalesOrder(id: ID!): GetSalesOrderResponse
+# }
+
+# type Mutation {
+#   saveSalesOrder(input: SalesOrderInput!): SalesOrder
+# }

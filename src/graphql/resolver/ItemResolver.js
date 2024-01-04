@@ -1,4 +1,3 @@
-// const { error } = require("console");
 const { db } = require("../../db/index");
 
 const resolvers = {
@@ -10,7 +9,7 @@ const resolvers = {
       try {
         const query = {
           text: `
-                     SELECT * FROM item WHERE id = $1 
+                     SELECT * FROM item WHERE itemid = $1 
                 `,
           values: [id],
         };

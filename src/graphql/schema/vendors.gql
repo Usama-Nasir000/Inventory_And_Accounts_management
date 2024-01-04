@@ -1,4 +1,3 @@
-
 type Vendor {
   userid: Int
   vendorid: Int
