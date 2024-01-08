@@ -20,8 +20,6 @@ type Vendor {
 }
 
 type VendorBillingAddress {
-  userid:Int
-  vendorid:Int 
   location: String
   state: String
   city: String

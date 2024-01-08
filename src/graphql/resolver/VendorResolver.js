@@ -24,20 +24,20 @@ const resolvers = {
           Vendor.Currency,
           Vendor.payment_terms,
           ARRAY_AGG(DISTINCT JSONB_BUILD_OBJECT(
-          'billing_location', vendor_billing_address.location,
-          'billing_state', vendor_billing_address.State,
-          'billing_city', vendor_billing_address.City,
-          'billing_country', vendor_billing_address.Country,
-          'billing_zipcode', vendor_billing_address.ZipCode,
-          'billing_isdefault', vendor_billing_address.IsDefault
+          'location', vendor_billing_address.location,
+          'state', vendor_billing_address.State,
+          'city', vendor_billing_address.City,
+          'country', vendor_billing_address.Country,
+          'zipcode', vendor_billing_address.ZipCode,
+          'isdefault', vendor_billing_address.IsDefault
           )) AS vendor_billing_address,
               ARRAY_AGG(DISTINCT JSONB_BUILD_OBJECT(
-                  'shipping_location', Vendor_Shipping_Addresses.location,
-                  'shipping_state', Vendor_Shipping_Addresses.State,
-                  'shipping_city', Vendor_Shipping_Addresses.City,
-                  'shipping_country', Vendor_Shipping_Addresses.Country,
-                  'shipping_zipcode', Vendor_Shipping_Addresses.ZipCode,
-                  'shipping_isdefault', Vendor_Shipping_Addresses.IsDefault
+                  'location', Vendor_Shipping_Addresses.location,
+                  'state', Vendor_Shipping_Addresses.State,
+                  'city', Vendor_Shipping_Addresses.City,
+                  'country', Vendor_Shipping_Addresses.Country,
+                  'zipcode', Vendor_Shipping_Addresses.ZipCode,
+                  'isdefault', Vendor_Shipping_Addresses.IsDefault
                   )) AS Vendor_Shipping_Addresses,
                   ARRAY_AGG(DISTINCT JSONB_BUILD_OBJECT(
                       'contact_first_name', Vendor_Contact_Person.CPFirstName,
@@ -79,9 +79,11 @@ const resolvers = {
           const response = {
             code: 200,
             status: 'success',
+            count: result.rowCount,
             data: result.rows[0],
           };
-          console.log(response.data.vendor_billing_address[0]);
+          console.log(response);
+          // console.log(response.data.vendor_billing_address[0]);
           return response;
         } else {
           const response = {
@@ -92,10 +94,12 @@ const resolvers = {
           return response;
         }
       } catch (error) {
+        console.log('Error in getVendor resolver:',error);
         const response = {
           code: 500,
           status: 'error',
-          data: error,
+          data: null,
+          error: error.message,
         };
         return response;
       }

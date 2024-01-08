@@ -1,10 +1,9 @@
-const id = require("faker/lib/locales/id_ID");
 const { db } = require("../../db/index");
 
 
 const resolver = {
     Query: {
-        getPurchaseOrder: async (_, { db }) => {
+        getPurchaseOrder: async (_, { id }) => {
             try {
                 const query = {
                     text: `
@@ -54,7 +53,7 @@ const resolver = {
                         status: 'success',
                         data: result.rows[0],
                     };
-                    console.log(response.data.vendor_billing_address[0]);
+                    console.log(response.data);
                     return response;
                 } else {
                     const response = {

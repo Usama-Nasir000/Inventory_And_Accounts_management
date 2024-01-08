@@ -1,6 +1,5 @@
 type PurchaseOrder {
   purchase_order_id: Int 
-  userid: Int
   vendor_id: Int 
   vendor_name: String 
   purchase_description: String 
@@ -59,7 +58,7 @@ type GetPurchaseOrderListResponse {
 
 type Query {
   getPurchaseOrders: GetPurchaseOrderListResponse
-  getPurchaseOrder(id: ID !): GetPurchaseOrderResponse
+  getPurchaseOrder(id: ID!): GetPurchaseOrderResponse
 }
 
 type Mutation {

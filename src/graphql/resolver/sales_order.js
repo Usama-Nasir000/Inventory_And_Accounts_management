@@ -3,50 +3,49 @@ const { db } = require("../../db/index");
 
 const resolver = {
     Query: {
-        getSalesOrder: async (_, { db }) => {
+        getSalesOrder: async (_, { id }) => {
             try {
                 const query = {
-                    text: `
-                    SELECT
-                        sales_order.sales_order_id,
-                        sales_order.customerid,
-                        sales_order.display_name,
-                        sales_order.sales_description,
-                        sales_order.order_date,
-                        sales_order.expected_date,
-                        sales_order.currency,
-                        sales_order.amount,
-                        sales_order.total_discount,
-                        sales_order.payment_due,
-                        sales_order.userid,
-                        ARRAY_AGG(DISTINCT JSONB_BUILD_OBJECT(
-                          'Item_ID', sales_item.item_id,
-                          'Item_Name', sales_item.item_name,
-                          'Sold_Quantity', sales_item.sold_quantity,
-                          'Item_Price', sales_item.item_price,
-                          'Item_Discount', sales_item.item_discount
-                          )) AS sales_item
-                              FROM
-                              sales_order
-                              LEFT JOIN sales_item ON sales_order.sales_order_id = sales_item.sales_order_id
-                              where sales_order.sales_order_id = $1
-                              GROUP BY
-                                sales_order.sales_order_id,
-                                sales_order.customerid,
-                                sales_order.display_name,
-                                sales_order.sales_description,
-                                sales_order.order_date,
-                                sales_order.expected_date,
-                                sales_order.currency,
-                                sales_order.amount,
-                                sales_order.total_discount,
-                                sales_order.payment_due,
-                                sales_order.userid;
-                    `,
+                    text: `SELECT
+                    sales_order.sales_order_id,
+                    sales_order.customerid,
+                    sales_order.display_name,
+                    sales_order.sales_description,
+                    sales_order.order_date,
+                    sales_order.expected_date,
+                    sales_order.currency,
+                    sales_order.amount,
+                    sales_order.total_discount,
+                    sales_order.payment_due,
+                    sales_order.userid,
+                    ARRAY_AGG(DISTINCT JSONB_BUILD_OBJECT(
+                      'item_id', sales_item.item_id,
+                      'item_name', sales_item.item_name,
+                      'sold_quantity', sales_item.sold_quantity,
+                      'item_price', sales_item.item_price,
+                      'item_discount', sales_item.item_discount
+                    )) AS sales_items
+                FROM
+                    sales_order
+                LEFT JOIN sales_item ON sales_order.sales_order_id = sales_item.sales_order_id
+                where sales_order.sales_order_id = $1
+                GROUP BY
+                    sales_order.sales_order_id,
+                    sales_order.customerid,
+                    sales_order.display_name,
+                    sales_order.sales_description,
+                    sales_order.order_date,
+                    sales_order.expected_date,
+                    sales_order.currency,
+                    sales_order.amount,
+                    sales_order.total_discount,
+                    sales_order.payment_due,
+                    sales_order.userid;
+                              `,
                     value: [id],
                 };
 
-                const result = await db.query(query.text, query.values);
+                const result = await db.query(query.text, query.value);
                 console.log("Result in Sales Order resolver -------- ", JSON.stringify(result.rows));
                 console.log("ID in Sales Order resolver --------------", id);
 
@@ -56,7 +55,7 @@ const resolver = {
                         status: 'success',
                         data: result.rows[0],
                     };
-                    console.log(response.data.vendor_billing_address[0]);
+                    console.log(response.data);
                     return response;
                 } else {
                     const response = {
