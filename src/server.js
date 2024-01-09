@@ -43,7 +43,7 @@ async function startApolloServer() {
   app.use(cors());
 
   const PORT = 4000;
-  const IP_ADDRESS = '192.168.4.119';
+  const IP_ADDRESS = '0.0.0.0';
 
   server.applyMiddleware({ app });
 
@@ -51,7 +51,7 @@ async function startApolloServer() {
 
 
   app.listen(PORT, IP_ADDRESS, () => {
-    console.log(`Server running at http://${IP_ADDRESS}:${PORT}`);
+    console.log(`Server running at http://${IP_ADDRESS}:${PORT}/graphql`);
   });
 }
 
