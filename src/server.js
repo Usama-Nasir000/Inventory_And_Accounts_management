@@ -1,47 +1,63 @@
-  const { ApolloServer } = require('apollo-server');
-  const typeDefs = require('./graphql/schema/schema');
+const express = require('express');
+const { ApolloServer } = require('apollo-server-express');
+const { ApolloServerPluginLandingPageGraphQLPlayground } = require('apollo-server-core');
+const cors = require('cors');
+const typeDefs = require('./graphql/schema/schema');
 
+const itemResolver = require('./graphql/resolver/ItemResolver');
+const customerResolver = require('./graphql/resolver/CustomerResolver');
+const vendorResolver = require('./graphql/resolver/VendorResolver');
+const sales_orderResolver = require('./graphql/resolver/sales_order');
+const purchase_orderResolver = require('./graphql/resolver/purchase_order');
 
-  const itemResolver = require('./graphql/resolver/ItemResolver');
-  const customerResolver = require('./graphql/resolver/CustomerResolver');
-  const vendorResolver = require('./graphql/resolver/VendorResolver');
-  const sales_orderResolver = require('./graphql/resolver/sales_order');
-  const purchase_orderResolver = require('./graphql/resolver/purchase_order');
+const resolvers = {
+  Query: {
+    ...itemResolver.Query,
+    ...customerResolver.Query,
+    ...vendorResolver.Query,
+    ...sales_orderResolver.Query,
+    ...purchase_orderResolver.Query,
+  },
+  Mutation: {
+    ...itemResolver.Mutation,
+    ...customerResolver.Mutation,
+    ...vendorResolver.Mutation,
+    ...sales_orderResolver.Mutation,
+    ...purchase_orderResolver.Mutation,
+  },
+};
 
-
-  const resolvers = { 
-    Query: {
-      ...itemResolver.Query,
-      ...customerResolver.Query,
-      ...vendorResolver.Query,
-      ...sales_orderResolver.Query,
-      ...purchase_orderResolver.Query,
-    },
-    Mutation: {
-      ...itemResolver.Mutation,
-      ...customerResolver.Mutation,
-      ...vendorResolver.Mutation,
-      ...sales_orderResolver.Mutation,
-      ...purchase_orderResolver.Mutation,
-    },
-  };
-
-
-
+async function startApolloServer() {
   const server = new ApolloServer({
     typeDefs,
     resolvers,
-
+    plugins: [
+      ApolloServerPluginLandingPageGraphQLPlayground(),
+    ],
   });
 
+  await server.start();  // Make sure to await server.start()
 
-  server.listen(4000).then(({ url }) => {
-    console.log(`Server running at ${url}`);
+  const app = express();
+
+  app.use(cors());
+
+  const PORT = 4000;
+  const IP_ADDRESS = '192.168.4.119';
+
+  server.applyMiddleware({ app });
+
+  app.use(cors());
+
+
+  app.listen(PORT, IP_ADDRESS, () => {
+    console.log(`Server running at http://${IP_ADDRESS}:${PORT}`);
   });
+}
 
-
-
-
+startApolloServer().catch((error) => {
+  console.error('Error starting the server:', error);
+});
 
 
 
