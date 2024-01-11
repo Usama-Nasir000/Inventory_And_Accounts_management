@@ -96,7 +96,7 @@ const resolvers = {
 
   },
   Mutation: {
-    saveItem: async (_,{image,...content}) => {
+    saveItem: async (_, { image, ...content }) => {
       const client = await db.connect();
       let response;
       let itemResult;
@@ -105,15 +105,27 @@ const resolvers = {
         await client.query('BEGIN');
 
 
-        const {createReadStream , filename} = await content.image;
+        const { createReadStream } = await content.image;
         const stream = createReadStream();
         const path = '../../images/'
+        // Generate a unique filename based on the current timestamp
+        const timestamp = new Date().toISOString().replace(/[-:.]/g, '');
+        const newFilename = `${timestamp}.jpg`; // Adjust the extension as needed
+
+        // Specify the full path for the new filename
+        const fullPath = path + newFilename;
 
         await new Promise((resolve, reject) =>
           stream
-            .pipe(createWriteStream(path))
-            .on('finish', resolve)
-            .on('error', reject)
+            .pipe(createWriteStream(fullPath))
+            .on('finish', () => {
+              // Resolve with the new filename when the operation is complete
+              resolve(newFilename);
+            })
+            .on('error', (error) => {
+              // Reject with the error if there's an issue during the operation
+              reject(error);
+            })
         );
 
         content.item_image = path;
@@ -141,7 +153,7 @@ const resolvers = {
                  )
              RETURNING *;
              `
-             ,
+          ,
           values: [
             content.userid,
             content.itemid,
@@ -160,7 +172,7 @@ const resolvers = {
           ],
         };
 
-         itemResult = await client.query(saveItemQuery.text, saveItemQuery.values);
+        itemResult = await client.query(saveItemQuery.text, saveItemQuery.values);
 
         if (itemResult.rowCount !== 1) {
           throw new Error('Failed to insert customer');
@@ -170,8 +182,8 @@ const resolvers = {
         response = {
           status: 'success',
           code: 200,
-          id:content.itemid,
-          ItemResult:itemResult.rows[0],
+          id: content.itemid,
+          ItemResult: itemResult.rows[0],
         };
 
 
