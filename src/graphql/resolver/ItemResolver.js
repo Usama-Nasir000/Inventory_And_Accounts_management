@@ -128,7 +128,7 @@ const resolvers = {
             })
         );
 
-        content.item_image = path;
+        content.item_image = fullPath;
 
         // SAVING CUSTOMER
         const saveItemQuery = {
