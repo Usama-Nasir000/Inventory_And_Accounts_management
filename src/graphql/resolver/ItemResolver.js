@@ -1,4 +1,7 @@
+// const {GraphQLUpload} = require ('graphql-upload');
+const { createWriteStream } = require('fs');
 const { db } = require("../../db/index");
+// const { path } = require('../../images/')
 
 const resolvers = {
   Query: {
@@ -93,13 +96,27 @@ const resolvers = {
 
   },
   Mutation: {
-    saveItem: async (_, content) => {
+    saveItem: async (_,{image,...content}) => {
       const client = await db.connect();
       let response;
       let itemResult;
       try {
         // Begin a transaction
         await client.query('BEGIN');
+
+
+        const {createReadStream , filename} = await content.image;
+        const stream = createReadStream();
+        const path = '../../images/'
+
+        await new Promise((resolve, reject) =>
+          stream
+            .pipe(createWriteStream(path))
+            .on('finish', resolve)
+            .on('error', reject)
+        );
+
+        content.item_image = path;
 
         // SAVING CUSTOMER
         const saveItemQuery = {

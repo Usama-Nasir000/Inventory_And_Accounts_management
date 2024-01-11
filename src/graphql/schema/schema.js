@@ -1,4 +1,6 @@
-const { gql } = require('apollo-server');
+// const { gql } = require('apollo-server-express');
+// const { GraphQLUpload } = require('graphql-upload');
+const { gql } = require('apollo-server-express');
 const fs = require('fs');
 const path = require('path');
 
@@ -7,7 +9,7 @@ const customersSchemaPath = path.join(__dirname, 'customers.gql');
 const vendorsSchemaPath = path.join(__dirname, 'vendors.gql');
 const itemsSchemaPath = path.join(__dirname, 'items.gql');
 const sales_orderSchemaPath = path.join(__dirname,'sales_order.gql');
-const purchase_orderSchemaPath = path.join(__dirname,'purchase_order.gql')
+const purchase_orderSchemaPath = path.join(__dirname,'purchase_order.gql');
 
 // Read the contents of the .gql files
 const customersTypeDefs = fs.readFileSync(customersSchemaPath, 'utf8');
@@ -24,5 +26,6 @@ const TypeDefs = gql`
   ${sales_orderTypeDefs}
   ${purchase_orderTypeDefs}
 `;
+
 
 module.exports = TypeDefs;

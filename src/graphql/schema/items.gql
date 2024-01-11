@@ -1,3 +1,7 @@
+# const { GraphQLUpload } = require('graphql-upload');
+scalar Upload
+
+
 type Item {
   userid: Int
   itemid: Int
@@ -36,6 +40,7 @@ type Mutation {
   saveItem(
     userid: Int
     itemid: Int
+    image: Upload
     item_image: String
     item_name: String
     item_code: String

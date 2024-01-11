@@ -1,7 +1,9 @@
 const express = require('express');
 const { ApolloServer } = require('apollo-server-express');
-const { ApolloServerPluginLandingPageGraphQLPlayground } = require('apollo-server-core');
+// const { ApolloServerPluginLandingPageGraphQLPlayground } = require('apollo-server-core');
 const cors = require('cors');
+
+// const { GraphQLUpload } = require('graphql-upload/cjs');
 const typeDefs = require('./graphql/schema/schema');
 
 const itemResolver = require('./graphql/resolver/ItemResolver');
@@ -32,7 +34,7 @@ async function startApolloServer() {
     typeDefs,
     resolvers,
     plugins: [
-      ApolloServerPluginLandingPageGraphQLPlayground(),
+      // ApolloServerPluginLandingPageGraphQLPlayground(),
     ],
   });
 
@@ -43,7 +45,7 @@ async function startApolloServer() {
   app.use(cors());
 
   const PORT = 4000;
-  const IP_ADDRESS = '0.0.0.0';
+  const IP_ADDRESS = 'localhost';
 
   server.applyMiddleware({ app });
 
