@@ -1,6 +1,6 @@
 const express = require('express');
 const { ApolloServer } = require('apollo-server-express');
-const { ApolloServerPluginLandingPageGraphQLPlayground } = require('apollo-server-core');
+// const { ApolloServerPluginLandingPageGraphQLPlayground } = require('apollo-server-core');
 const cors = require('cors');
 
 // const { GraphQLUpload } = require('graphql-upload/cjs');
@@ -34,7 +34,7 @@ async function startApolloServer() {
     typeDefs,
     resolvers,
     plugins: [
-      ApolloServerPluginLandingPageGraphQLPlayground(),
+      // ApolloServerPluginLandingPageGraphQLPlayground(),
     ],
   });
 
