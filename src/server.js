@@ -45,7 +45,7 @@ async function startApolloServer() {
   app.use(cors());
 
   const PORT = 4000;
-  const IP_ADDRESS = 'localhost';
+  const IP_ADDRESS = '0.0.0.0';
 
   server.applyMiddleware({ app });
 
