@@ -166,27 +166,29 @@ const resolver = {
 
                 const saveSalesOrderQuery = {
                     text: `
-                      INSERT INTO purchase_order (
-                        purchase_order_id,
-                        vendor_id,
-                        vendor_name,
-                        purchase_description,
+                      INSERT INTO sales_order (
+                        sales_order_id,
+                        customerid,
+                        display_name,
+                        sales_description,
                         order_date,
                         expected_date,
                         currency,
                         amount,
                         total_discount,
                         payment_due,
-                        userid,
+                        userid
                       )
-                      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+                      VALUES (
+                        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11
+                        )
                       RETURNING *;
                     `,
                     values: [
-                        input.purchase_order_id,
-                        input.vendor_id,
-                        input.vendor_name,
-                        input.purchase_description,
+                        input.sales_order_id,
+                        input.customerid,
+                        input.display_name,
+                        input.sales_description,
                         input.order_date,
                         input.expected_date,
                         input.currency,
@@ -198,7 +200,7 @@ const resolver = {
 
                 };
 
-                salesOrderResult = await db.query(saveSalesOrderQuery.text, saveSalesOrderQuery.values);
+                salesOrderResult = await client.query(saveSalesOrderQuery.text, saveSalesOrderQuery.values);
 
                 if (salesOrderResult === 0) {
                     throw new Error("Failed to Insert Sales Order");
@@ -231,7 +233,10 @@ const resolver = {
                             SalesItem.item_discount,
                         ],
                     };
-                    salesItemResult = await client.query(saveSalesItemQuery.text, saveSalesItemQuery.values);
+                    await client.query(saveSalesItemQuery.text, saveSalesItemQuery.values);
+                    salesItemResult = await client.query(`select * from sales_item where sales_order_id = ${input.sales_order_id}`);
+
+                    console.log("salesItemResult",  salesItemResult);
 
                     if (salesItemResult === 0) {
                         throw new Error("Failed To Insert Into Sales Item");
@@ -241,11 +246,16 @@ const resolver = {
                 response = {
                     code: 200,
                     status: 'Success',
-                    savedResult: salesOrderResult, salesItemResult
-                };
+                    id: input.sales_order_id ,
+                    data: {
+                      salesOrder: salesOrderResult.rows[0],
+                      salesItems: salesItemResult.rows,
+                    },
+                  };
 
                 //Commit the transection if everything is successful
                 await client.query('COMMIT');
+                console.log("data > salesItem", response.data.salesItems.rows)
                 console.log("Transaction Successful")
                 return response;
             } catch (error) {

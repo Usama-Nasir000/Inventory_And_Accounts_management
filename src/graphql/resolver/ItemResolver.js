@@ -1,4 +1,5 @@
 // const {GraphQLUpload} = require ('graphql-upload');
+const { path } = require('path');
 const { createWriteStream } = require('fs');
 const { db } = require("../../db/index");
 // const { path } = require('../../images/')
@@ -96,7 +97,7 @@ const resolvers = {
 
   },
   Mutation: {
-    saveItem: async (_, { image, ...content }) => {
+    saveItem: async (_, { input }) => {
       const client = await db.connect();
       let response;
       let itemResult;
@@ -105,15 +106,18 @@ const resolvers = {
         await client.query('BEGIN');
 
 
-        const { createReadStream } = await content.image;
-        const stream = createReadStream();
+        const { createReadStream } = await input.image;
+        const stream = input.image && createReadStream();
+
         const path = '../../images/'
         // Generate a unique filename based on the current timestamp
         const timestamp = new Date().toISOString().replace(/[-:.]/g, '');
         const newFilename = `${timestamp}.jpg`; // Adjust the extension as needed
 
         // Specify the full path for the new filename
-        const fullPath = path + newFilename;
+        // const fullPath = path + newFilename;
+        const fullPath = path.join(__dirname, '../../images/', newFilename);
+
 
         await new Promise((resolve, reject) =>
           stream
@@ -128,7 +132,7 @@ const resolvers = {
             })
         );
 
-        content.item_image = fullPath;
+        input.item_image = fullPath;
 
         // SAVING CUSTOMER
         const saveItemQuery = {
@@ -155,20 +159,22 @@ const resolvers = {
              `
           ,
           values: [
-            content.userid,
-            content.itemid,
-            content.item_image,
-            content.item_name,
-            content.item_code,
-            content.category,
-            content.status,
-            content.purchase_price,
-            content.sales_price,
-            content.stock_quantity,
-            content.income_account,
-            content.cogs_account,
-            content.inventory_account,
-            content.currency,
+            // content.userid,
+            1,
+            // content.itemid,
+            3,
+            input.item_image,
+            input.item_name,
+            input.item_code,
+            input.category,
+            input.status,
+            input.purchase_price,
+            input.sales_price,
+            input.stock_quantity,
+            input.income_account,
+            input.cogs_account,
+            input.inventory_account,
+            input.currency,
           ],
         };
 
@@ -182,7 +188,7 @@ const resolvers = {
         response = {
           status: 'success',
           code: 200,
-          id: content.itemid,
+          id: input.itemid,
           ItemResult: itemResult.rows[0],
         };
 

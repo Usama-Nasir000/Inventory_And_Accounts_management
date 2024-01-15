@@ -71,48 +71,18 @@ type Query {
   getSalesOrder(id: ID!): GetSalesOrderResponse
 }
 
-type Mutation {
-  saveSalesOrder(input: SalesOrderInput): SalesOrder
+type SalesOrderResponse{
+  code: Int
+  status: String
+  id: Int
+  data: SaveSalesOrderData
 }
 
+type SaveSalesOrderData{
+  salesOrder: SalesOrder
+  salesItems: [SalesOrderQuantity!]
+}
 
-
-# type SalesOrder {
-#   sales_order_id: ID
-#   customer: Customer       # Reference to the customer
-#   sales_description: String
-#   order_date: String
-#   expected_date: String
-#   currency: String
-#   amount: Float
-#   total_discount: Float
-#   payment_due: String!
-#   quantity: [SalesOrderQuantity!]!
-# }
-
-# input SalesOrderInput {
-#   customer_id: Int!        # Instead of customer_name, use customer_id
-#   sales_description: String
-#   order_date: String
-#   expected_date: String
-#   currency: String
-#   amount: Float
-#   total_discount: Float
-#   payment_due: String!
-#   quantity: [SalesOrderQuantityInput!]!
-# }
-
-# type GetSalesOrderResponse {
-#   code: Int
-#   status: String
-#   data: SalesOrder
-# }
-
-# type Query {
-#   getSalesOrders: GetSalesOrderListResponse
-#   getSalesOrder(id: ID!): GetSalesOrderResponse
-# }
-
-# type Mutation {
-#   saveSalesOrder(input: SalesOrderInput!): SalesOrder
-# }
+type Mutation {
+  saveSalesOrder(input: SalesOrderInput): SalesOrderResponse
+}

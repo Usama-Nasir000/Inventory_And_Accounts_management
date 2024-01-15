@@ -40,11 +40,11 @@ const resolvers = {
                   'isdefault', Vendor_Shipping_Addresses.IsDefault
                   )) AS Vendor_Shipping_Addresses,
                   ARRAY_AGG(DISTINCT JSONB_BUILD_OBJECT(
-                      'contact_first_name', Vendor_Contact_Person.CPFirstName,
-                      'contact_last_name', Vendor_Contact_Person.CPLastName,
-                      'contact_email', Vendor_Contact_Person.CPEmail,
-                      'contact_phone', Vendor_Contact_Person.CPcontact,
-                      'contact_job_role', Vendor_Contact_Person.CPJobRole
+                      'cpfirstname', Vendor_Contact_Person.CPFirstName,
+                      'cplastname', Vendor_Contact_Person.CPLastName,
+                      'cpemail', Vendor_Contact_Person.CPEmail,
+                      'cpcontact', Vendor_Contact_Person.CPcontact,
+                      'cpjobrole', Vendor_Contact_Person.CPJobRole
                       )) AS Vendor_Contact_Person
                       FROM Vendor
                       LEFT JOIN vendor_billing_address ON Vendor.VendorID = vendor_billing_address.VendorID
@@ -143,11 +143,11 @@ const resolvers = {
                   'isdefault', vendor_shipping_addresses.IsDefault
                   )) AS vendor_shipping_addresses,
                   ARRAY_AGG(DISTINCT JSONB_BUILD_OBJECT(
-                      'contact_first_name', Vendor_Contact_Person.CPFirstName,
-                      'contact_last_name', Vendor_Contact_Person.CPLastName,
-                      'contact_email', Vendor_Contact_Person.CPEmail,
-                      'contact_phone', Vendor_Contact_Person.CPcontact,
-                      'contact_job_role', Vendor_Contact_Person.CPJobRole
+                      'cpfirstname', Vendor_Contact_Person.CPFirstName,
+                      'cplastname', Vendor_Contact_Person.CPLastName,
+                      'cpemail', Vendor_Contact_Person.CPEmail,
+                      'cpcontact', Vendor_Contact_Person.CPcontact,
+                      'cpjobrole', Vendor_Contact_Person.CPJobRole
                       )) AS Vendor_Contact_Person
                       FROM Vendor
                       LEFT JOIN vendor_billing_address ON Vendor.VendorID = vendor_billing_address.VendorID
@@ -212,9 +212,10 @@ const resolvers = {
 
   Mutation: {
     saveVendor: async (_, content) => {
+      let input = content.input
       const client = await db.connect();
       console.log("connection build on vendor resolver");
-      console.log("Content in vendorResolver:  ", content);
+      console.log("Content in vendorResolver:  ", input);
       let response;
       let vendorResult;
       let vendorBillingAddressResult;
@@ -249,21 +250,21 @@ const resolvers = {
             RETURNING *;
           `,
           values: [
-            content.userid,
-            content.vendorid,
-            content.category,
-            content.company_name,
-            content.email,
-            content.main_phone,
-            content.work_phone,
-            content.first_name,
-            content.middle_name,
-            content.last_name,
-            content.display_name,
-            content.website,
-            content.amount,
-            content.currency,
-            content.payment_terms,
+            input.userid,
+            input.vendorid,
+            input.category,
+            input.company_name,
+            input.email,
+            input.main_phone,
+            input.work_phone,
+            input.first_name,
+            input.middle_name,
+            input.last_name,
+            input.display_name,
+            input.website,
+            input.amount,
+            input.currency,
+            input.payment_terms,
           ],
         };
   
@@ -274,7 +275,7 @@ const resolvers = {
         }
 
         // Save vendor_billing_address
-        const billingAddresses = content.vendor_billing_address;
+        const billingAddresses = input.vendor_billing_address;
         for (const billingAddress of billingAddresses ) {
         const saveBillingAddressQuery = {
           text: `
@@ -293,7 +294,7 @@ const resolvers = {
             RETURNING *;
           `,
           values: [
-            content.vendorid,
+            input.vendorid,
             billingAddress.location,
             billingAddress.state,
             billingAddress.city,
@@ -311,7 +312,7 @@ const resolvers = {
       };
 
         // Save VendorShippingAddresses
-        const shippingAddresses = content.vendor_shipping_addresses;
+        const shippingAddresses = input.vendor_shipping_addresses;
         for (const shippingAddress of shippingAddresses){
         const saveShippingAddressQuery = {
           text: `
@@ -330,7 +331,7 @@ const resolvers = {
             RETURNING *;
           `,
           values: [
-            content.vendorid,
+            input.vendorid,
             shippingAddress.location,
             shippingAddress.state,
             shippingAddress.city,
@@ -349,7 +350,7 @@ const resolvers = {
 
 
         // Save VendorContactPerson
-        const contactPersons = content.vendor_contact_person;
+        const contactPersons = input.vendor_contact_person;
         for (const contactPerson of contactPersons){
           const saveContactPersonQuery = {
             text: `
@@ -367,12 +368,12 @@ const resolvers = {
               RETURNING *;
             `,
             values: [
-              content.vendorid,
-              contactPerson.contact_first_name,
-              contactPerson.contact_last_name,
-              contactPerson.contact_email,
-              contactPerson.contact_phone,
-              contactPerson.contact_job_role,
+              input.vendorid,
+              contactPerson.cpfirstname,
+              contactPerson.cplastname,
+              contactPerson.cpemail,
+              contactPerson.cpcontact,
+              contactPerson.cpjobrole,
             ],
           };
   
@@ -383,15 +384,19 @@ const resolvers = {
           }
         };
 
-         response = {
-        code: 200,
-        status: 'success',
-        id: content.vendorid,
-        vendorResult: vendorResult.rows[0],
-        vendorBillingAddressCount: vendorBillingAddressResult.rowCount,
-        vendorShippingAddressCount: vendorShippingAddressResult.rowCount,
-        vendorContactPersonCount: vendorContactPersonResult.rowCount,
-      };
+        response = {
+          code: 200,
+          status: 'success',
+          id: input.vendorid,
+          data: {
+            vendor: vendorResult.rows[0], 
+            billingAddresses: vendorBillingAddressResult.rows,
+            shippingAddresses: vendorShippingAddressResult.rows,
+            contactPersons: vendorContactPersonResult.rows,  
+          },
+        };
+
+      console.log(response.data);
 
         // Commit the transaction if everything is successful
         await client.query('COMMIT');
@@ -412,7 +417,6 @@ const resolvers = {
         client.release();
       }
     },
-    // Add mutation resolvers for saving vendor_billing_address, vendorshippingaddresses, and vendorcontactperson
   },
 
   Vendor: {

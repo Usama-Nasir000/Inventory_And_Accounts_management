@@ -38,14 +38,14 @@ type VendorShippingAddress {
 }
 
 type VendorContactPerson {
-  contact_first_name: String
-  contact_last_name: String
-  contact_email: String
-  contact_phone: String
-  contact_job_role: String
+  cpfirstname: String
+  cplastname: String
+  cpemail: String
+  cpcontact: String
+  cpjobrole: String
 }
 
-input vendor_billing_address_Input {
+input VendorBillingAddressInput {
   vendorid: Int
   location: String
   state: String
@@ -55,7 +55,7 @@ input vendor_billing_address_Input {
   isdefault: Boolean
 }
 
-input vendor_Shipping_Address_Input {
+input VendorShippingAddressInput {
   vendorid: Int
   location: String
   state: String
@@ -65,13 +65,13 @@ input vendor_Shipping_Address_Input {
   isdefault: Boolean
 }
 
-input Vendor_Contact_Person_Input {
+input VendorContactPersonInput {
   vendorid: Int
-  contact_first_name: String
-  contact_last_name: String
-  contact_email: String
-  contact_phone: String
-  contact_job_role: String
+  cpfirstname: String
+  cplastname: String
+  cpemail: String
+  cpcontact: String
+  cpjobrole: String
   }
 
 type GetVendorResponse {
@@ -86,32 +86,71 @@ type GetVendorListResponse {
   data: [Vendor]
 }
 
+input SaveVendorInput{
+  userid: Int
+  vendorid:Int
+  category:String
+  company_name:String
+  email:String
+  main_phone:String
+  work_phone:String
+  first_name:String
+  middle_name:String
+  last_name:String
+  display_name:String
+  website:String
+  amount:String
+  currency:String
+  payment_terms:String
+  vendor_billing_address: [VendorBillingAddressInput]
+  vendor_shipping_addresses: [VendorShippingAddressInput]
+  vendor_contact_person: [VendorContactPersonInput]
+}
+
+type SaveVendorResponse{
+  code: Int
+  status: String
+  id: Int
+  data: SaveVendorData
+}
+
+type SaveVendorData{
+  vendor: Vendor
+  billingAddresses: [VendorBillingAddress]
+  shippingAddresses: [VendorShippingAddress]
+  contactPersons: [VendorContactPerson]
+}
+
 type Query {
   getVendors: GetVendorListResponse
   getVendor(id: ID!): GetVendorResponse
 }
 
-type Mutation {
-  saveVendor(
-    userid: Int
-    vendorid: Int
-    category: String
-    company_name: String
-    email: String
-    main_phone: String
-    work_phone: String
-    first_name: String
-    middle_name: String
-    last_name: String
-    display_name: String
-    website: String
-    amount: String
-    currency: String
-    payment_terms: String
-    vendor_billing_address: [vendor_billing_address_Input]
-    vendor_shipping_addresses: [vendor_Shipping_Address_Input]
-    vendor_contact_person: [Vendor_Contact_Person_Input]
-  ): Vendor
+type Mutation{
+  saveVendor(input: SaveVendorInput): SaveVendorResponse
 }
+
+# type Mutation {
+#   saveVendor(
+#     userid: Int
+#     vendorid: Int
+#     category: String
+#     company_name: String
+#     email: String
+#     main_phone: String
+#     work_phone: String
+#     first_name: String
+#     middle_name: String
+#     last_name: String
+#     display_name: String
+#     website: String
+#     amount: String
+#     currency: String
+#     payment_terms: String
+#     vendor_billing_address: [vendor_billing_address_Input]
+#     vendor_shipping_addresses: [vendor_Shipping_Address_Input]
+#     vendor_contact_person: [Vendor_Contact_Person_Input]
+#   ): Vendor
+# }
 
 

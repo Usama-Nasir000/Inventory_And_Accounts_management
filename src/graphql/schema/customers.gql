@@ -38,11 +38,11 @@ type CustomerShippingAddress {
 }
 
 type CustomerContactPerson {
-  contact_first_name: String
-  contact_last_name: String
-  contact_email: String
-  contact_phone: String
-  contact_job_role: String
+  cpfirstname: String
+  cplastname: String
+  cpemail: String
+  cpcontact: String
+  cpjobrole: String
 }
 
 input CustomerBillingAddressInput {
@@ -67,11 +67,11 @@ input CustomerShippingAddressInput {
 
 input CustomerContactPersonInput {
   customerid:Int
-  contact_first_name: String
-  contact_last_name: String
-  contact_email: String
-  contact_phone: String
-  contact_job_role: String
+  cpfirstname: String
+  cplastname: String
+  cpemail: String
+  cpcontact: String
+  cpjobrole: String
 }
 
 type GetCustomerResponse {
@@ -86,30 +86,47 @@ type GetCustomerListResponse {
   data: [Customer]
 }
 
+input SaveCustomerInput {
+  userid: Int
+  customerid: Int
+  category: String
+  company_name: String
+  email: String
+  main_phone: String
+  work_phone: String
+  first_name: String
+  middle_name: String
+  last_name: String
+  display_name: String
+  website: String
+  amount: String
+  currency: String
+  payment_terms: String
+  customer_billing_address: [CustomerBillingAddressInput]
+  customer_shipping_addresses: [CustomerShippingAddressInput]
+  customer_contact_person: [CustomerContactPersonInput]
+}
+
+type SaveCustomerResponse {
+  code: Int
+  status: String
+  id: Int
+  data: SaveCustomerData
+}
+
+type SaveCustomerData {
+  customer: Customer
+  billingAddresses: [CustomerBillingAddress]
+  shippingAddresses: [CustomerShippingAddress]
+  contactPersons: [CustomerContactPerson]
+}
+
+
 type Query {
   getCustomers: GetCustomerListResponse
   getCustomer(id: ID!): GetCustomerResponse
 }
 
 type Mutation {
-  saveCustomer(
-    userid: Int
-    customerid: Int
-    category: String
-    company_name: String
-    email: String
-    main_phone: String
-    work_phone: String
-    first_name: String
-    middle_name: String
-    last_name: String
-    display_name: String
-    website: String
-    amount: String
-    currency: String
-    payment_terms: String
-    customer_billing_address: [CustomerBillingAddressInput]
-    customer_shipping_addresses: [CustomerShippingAddressInput]
-    customer_contact_person: [CustomerContactPersonInput]
-  ): Customer
+  saveCustomer(input: SaveCustomerInput): SaveCustomerResponse
 }

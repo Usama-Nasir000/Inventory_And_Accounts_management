@@ -5,6 +5,7 @@ scalar Upload
 type Item {
   userid: Int
   itemid: Int
+  image: Upload
   item_image: String
   item_name: String
   item_code: String
@@ -37,21 +38,43 @@ type Query {
 }
 
 type Mutation {
-  saveItem(
-    userid: Int
-    itemid: Int
-    image: Upload
-    item_image: String
-    item_name: String
-    item_code: String
-    category: String
-    status: String
-    purchase_price: Float 
-    sales_price: Float
-    stock_quantity: Int
-    income_account: String
-    cogs_account: String
-    inventory_account: String
-    currency: String
-  ): Item
+  saveItem(input: SaveItemInput): Item
 }
+
+input SaveItemInput {
+  userid: Int
+  itemid: Int
+  image: Upload
+  item_image: String
+  item_name: String
+  item_code: String
+  category: String
+  status: String
+  purchase_price: Float
+  sales_price: Float
+  stock_quantity: Int
+  income_account: String
+  cogs_account: String
+  inventory_account: String
+  currency: String
+}
+
+# type Mutation {
+#   saveItem(
+#     userid: Int
+#     itemid: Int
+#     image: Upload
+#     item_image: String
+#     item_name: String
+#     item_code: String
+#     category: String
+#     status: String
+#     purchase_price: Float 
+#     sales_price: Float
+#     stock_quantity: Int
+#     income_account: String
+#     cogs_account: String
+#     inventory_account: String
+#     currency: String
+#   ): Item
+# }
