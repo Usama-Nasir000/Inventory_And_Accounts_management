@@ -61,7 +61,19 @@ type Query {
   getPurchaseOrder(id: ID!): GetPurchaseOrderResponse
 }
 
+type PurchaseOrderResponse{
+  code: Int
+  status: String
+  id: Int
+  data: SavePurchaseOrderData
+}
+
+type SavePurchaseOrderData{
+  purchaseOrder:PurchaseOrder
+  purchaseItems:[PurchaseOrderQuantity]
+}
+
 type Mutation {
-  savePurchaseOrder(input: PurchaseOrderInput): PurchaseOrder
+  savePurchaseOrder(input: PurchaseOrderInput): PurchaseOrderResponse
 }
 

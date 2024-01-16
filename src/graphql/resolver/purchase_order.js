@@ -218,7 +218,9 @@ const resolver = {
                             PurchaseItem.item_discount
                         ]
                     };
-                    purchaseItemsResult = await client.query(savePurchaseItemQuery.text,savePurchaseItemQuery.values);
+                    await client.query(savePurchaseItemQuery.text,savePurchaseItemQuery.values);
+                    purchaseItemsResult = await client.query(`select * from purchase_items where purchase_order_id = ${input.purchase_order_id}`);
+                    console.log("Purchase Order Result", purchaseItemsResult);
 
                     if(purchaseItemsResult === 0 ){
                         throw new Error("Failed To Inser Purchase Items")
@@ -228,7 +230,12 @@ const resolver = {
                 response = {
                     code: 200,
                     status: 'Success',
-                    savedResult: purchaseOrderResult, purchaseItemsResult
+                    id: input.purchase_order_id,
+                    data:{
+                        purchaseOrder:purchaseOrderResult.rows[0],
+                        purchaseItems:purchaseItemsResult.rows
+                    },
+                    // savedResult: purchaseOrderResult, purchaseItemsResult
                 };
 
                 //Commit the transection if everything is successful
@@ -257,7 +264,7 @@ const resolver = {
                     text:`SELECT purchase_order_id, item_id, item_name, purchase_quantity, item_price, item_discount FROM purchase_items WHERE purchase_order_id = $1`,
                     value: [parent.purchase_order_id],
                 };
-                const result = await client.query(query.text,query.value);
+                const result = await db.query(query.text,query.value);
                 console.log("Purchase Item Result",result.rows);
                 return result.rows[0];
             }catch(error){
