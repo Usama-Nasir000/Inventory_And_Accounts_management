@@ -126,7 +126,12 @@ type Query {
   getCustomers: GetCustomerListResponse
   getCustomer(id: ID!): GetCustomerResponse
 }
+  
 
 type Mutation {
   saveCustomer(input: SaveCustomerInput): SaveCustomerResponse
+  updateCustomer(
+    id:ID!
+    input: SaveCustomerInput): SaveCustomerResponse
+  deleteCustomer(id: ID!): GetCustomerResponse
 }

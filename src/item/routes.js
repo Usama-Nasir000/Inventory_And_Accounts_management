@@ -35,6 +35,7 @@ router.post('/create-item', upload.single('item_image'), async (req, res) => {
           data: newItem,
         })
         console.log(newItem.item_image);
+        console.log(__dirname);
         // res.status(201).json(newItem);
     }else{
       res.status(500).json({ error: 'Have null value' });

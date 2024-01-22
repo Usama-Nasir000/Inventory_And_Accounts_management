@@ -169,7 +169,7 @@ const deleteItem = async (itemId) => {
 
     // Delete query
     const deleteQuery = {
-      text: 'DELETE FROM item WHERE itemid = $1 RETURNING *;',
+      text: 'DELETE FROM item WHERE itemid = $1 RETURNING *; ',
       values: [itemId],
     };
 
@@ -177,8 +177,18 @@ const deleteItem = async (itemId) => {
     const result = await db.query(deleteQuery.text, deleteQuery.values);
 
     if (existingItem && existingItem.item_image) {
-      const imagePath = path.join(__dirname, '', existingItem.item_image);
-      fs.unlinkSync(imagePath);
+      const imagePath = path.join(__dirname, '..', existingItem.item_image);
+      fs.unlink(imagePath,(err)=>{
+        if(err){
+          console.log(err)
+          throw (err)
+        }
+        else{
+          return `Item with ID ${itemId} has been deleted successfully.`;
+        }
+      });
+      // console.log(imagePath);
+      // return imagePath;
     }
     // Return a message indicating successful deletion
     return `Item with ID ${itemId} has been deleted successfully.`;
