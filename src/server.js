@@ -32,8 +32,8 @@ async function startServer(){
 startServer().then( async ()=>{
    
   const PORT = 4000;
-  const IP_ADDRESS = '0.0.0.0';
-  // const IP_ADDRESS = 'localhost';
+  // const IP_ADDRESS = '0.0.0.0';
+  const IP_ADDRESS = 'localhost';
   app.listen(PORT, IP_ADDRESS, () => {
     console.log(`Server running at http://${IP_ADDRESS}:${PORT}`);
     console.log(`GraphQL playground at http://${IP_ADDRESS}:${PORT}${server.graphqlPath}`);
